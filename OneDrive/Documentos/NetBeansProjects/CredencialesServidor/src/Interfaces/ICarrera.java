@@ -5,17 +5,17 @@ import java.rmi.RemoteException;
 
 public interface ICarrera extends Remote {
 
-    int getCodCarrera() throws RemoteException;
+    int getIdCarrera() throws RemoteException;
 
-    void setCodCarrera(int codigocarrera) throws RemoteException;
+    void setIdCarrera(int idCarrera) throws RemoteException;
 
     String getNombreCarrera() throws RemoteException;
 
     void setNombreCarrera(String nombrecarrera) throws RemoteException;
 
-    int getFacultad() throws RemoteException;
+    int getIdFacultad() throws RemoteException;
 
-    void setFacultad(int facultad) throws RemoteException;
+    void setIdFacultad(int idFacultad) throws RemoteException;
 
     String getString() throws RemoteException;
 }

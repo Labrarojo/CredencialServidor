@@ -14,11 +14,13 @@ public interface ICarreraController extends Remote {
 
     int delete(ICarrera carrera) throws RemoteException;
 
-    int delete(int CodigoCarrera) throws RemoteException;
+    int delete(int idCarrera) throws RemoteException;
+
+    int delete(String nombreCarrera) throws RemoteException;
 
     List<ICarrera> list() throws RemoteException;
 
-    ICarrera findOne(int codigoCarrera) throws RemoteException;
+    ICarrera findOne(int idCarrera) throws RemoteException;
 
     ICarrera findOne(String nombreCarrera) throws RemoteException;
 

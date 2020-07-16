@@ -18,15 +18,13 @@ public class SecretarioController extends UnicastRemoteObject implements ISecret
         dbManager = new DBManager();
     }
 
-    @Override
     public ISecretario newInstance() throws RemoteException {
         return new Secretario();
     }
 
-    @Override
     public int add(ISecretario secretario) throws RemoteException {
-        ISecretario secretarioEncontrado = findOne(secretario.getMatriculaSecr());
-        boolean existe = secretarioEncontrado.getMatriculaSecr() != null;
+        ISecretario secretarioEncontrado = findOne(secretario.getMatriculaSecretario());
+        boolean existe = secretarioEncontrado.getMatriculaSecretario() != null;
 
         if (existe) {
             return ADD_MATRICULA_DUPLICADA;
@@ -38,32 +36,32 @@ public class SecretarioController extends UnicastRemoteObject implements ISecret
         return (respuesta > 0) ? ADD_EXITO : ADD_SIN_EXITO;
     }
 
-    @Override
     public int update(ISecretario secretario) throws RemoteException {
-        if (secretario.getMatriculaSecr() == null) {
+        if (secretario.getMatriculaSecretario() == null) {
             return UPDATE_MATRICULA_NULA;
         }
-        ISecretario secretarioEncontrado = findOne(secretario.getMatriculaSecr());
-        if (secretarioEncontrado.getMatriculaSecr() == null) {
+
+        ISecretario secretarioEncontrado = findOne(secretario.getMatriculaSecretario());
+        if (secretarioEncontrado.getMatriculaSecretario() == null) {
             return UPDATE_MATRICULA_INEXISTE;
         }
+
         Map<String, Object> datos = Secretario.toMap(secretario);
         Map<String, Object> where = new HashMap<>();
-        where.put("MatriculaSecr", secretario.getMatriculaSecr());
+        where.put("MatriculaSecretario", secretario.getMatriculaSecretario());
         int respuesta = dbManager.actualizar(TABLE, datos, where);
 
         return (respuesta > 0) ? UPDATE_EXITO : UPDATE_SIN_EXITO;
     }
 
-    @Override
     public int delete(ISecretario secretario) throws RemoteException {
-        ISecretario secretarioTemp = findOne(secretario.getMatriculaSecr());
-        if (secretarioTemp.getMatriculaSecr() == null) {
+        ISecretario secretarioTemp = findOne(secretario.getMatriculaSecretario());
+        if (secretarioTemp.getMatriculaSecretario() == null) {
             return DELETE_MATRICULA_INEXISTENTE;
         }
 
         Map<String, Object> where = new HashMap<>();
-        where.put("MatriculaSecr", secretario.getMatriculaSecr());
+        where.put("MatriculaSecretario", secretario.getMatriculaSecretario());
 
         int respuesta = dbManager.eliminar(TABLE, where);
 
@@ -74,14 +72,12 @@ public class SecretarioController extends UnicastRemoteObject implements ISecret
         }
     }
 
-    @Override
-    public int delete(String matriculaSecr) throws RemoteException {
+    public int delete(String matriculaSecretario) throws RemoteException {
         ISecretario secretario = new Secretario();
-        secretario.setMatriculaSecr(matriculaSecr);
+        secretario.setMatriculaSecretario(matriculaSecretario);
         return delete(secretario);
     }
 
-    @Override
     public List<ISecretario> list() throws RemoteException {
         List<ISecretario> listaISecretario = new ArrayList<>();
 
@@ -96,16 +92,14 @@ public class SecretarioController extends UnicastRemoteObject implements ISecret
         return listaISecretario;
     }
 
-    @Override
-    public ISecretario findOne(String nombreSecr) throws RemoteException {
+    public ISecretario findOne(String matriculaSecretario) throws RemoteException {
         Map<String, Object> where = new HashMap<>();
-        where.put("nombreSecr", nombreSecr);
+        where.put("MatriculaSecretario", matriculaSecretario);
         Map<String, Object> registro = dbManager.buscarUno(TABLE, where);
 
         return Secretario.fromMap(registro);
     }
 
-    @Override
     public List<ISecretario> find(ISecretario secretario) throws RemoteException {
         List<ISecretario> listaISecretario = new ArrayList<>();
 

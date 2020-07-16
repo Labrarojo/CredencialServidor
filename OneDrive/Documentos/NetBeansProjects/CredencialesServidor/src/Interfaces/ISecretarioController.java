@@ -14,13 +14,13 @@ public interface ISecretarioController extends Remote {
 
     int delete(ISecretario secretario) throws RemoteException;
 
-    int delete(String matriculaSecr) throws RemoteException;
+    int delete(String matriculaSecretario) throws RemoteException;
 
     List<ISecretario> list() throws RemoteException;
 
-    ISecretario findOne(String matriculaSecr) throws RemoteException;
+    ISecretario findOne(String matriculaSecretario) throws RemoteException;
 
-    List<ISecretario> find(ISecretario producto) throws RemoteException;
+    List<ISecretario> find(ISecretario secretario) throws RemoteException;
 
     int ADD_EXITO = 1;
     int ADD_MATRICULA_DUPLICADA = 2;

@@ -8,27 +8,26 @@ import java.util.Map;
 
 public class Carrera extends UnicastRemoteObject implements ICarrera {
 
-    private int codcarrera;
+    private int idcarrera;
     private String nombrecarrera;
-    private int facultad;
+    private int idfacultad;
 
     public Carrera() throws RemoteException {
 
     }
 
-    public Carrera(int codcarrera, String nombrecarrera, int facultad) throws RemoteException {
-        this.codcarrera = codcarrera;
+    public Carrera(int idcarrera, String nombrecarrera, int facultad) throws RemoteException {
+        this.idcarrera = idcarrera;
         this.nombrecarrera = nombrecarrera;
-        this.facultad = facultad;
+        this.idfacultad = facultad;
     }
 
-    @Override
-    public int getCodCarrera() throws RemoteException {
-        return codcarrera;
+    public int getIdCarrera() throws RemoteException {
+        return idcarrera;
     }
 
-    public void setCodCarrera(int codcarrera) throws RemoteException {
-        this.codcarrera = codcarrera;
+    public void setIdCarrera(int idcarrera) throws RemoteException {
+        this.idcarrera = idcarrera;
     }
 
     public String getNombreCarrera() throws RemoteException {
@@ -39,32 +38,31 @@ public class Carrera extends UnicastRemoteObject implements ICarrera {
         this.nombrecarrera = nombrecarrera;
     }
 
-    public int getFacultad() throws RemoteException {
-        return facultad;
+    public int getIdFacultad() throws RemoteException {
+        return idfacultad;
     }
 
-    public void setFacultad(int facultad) throws RemoteException {
-        this.facultad = facultad;
+    public void setIdFacultad(int idfacultad) throws RemoteException {
+        this.idfacultad = idfacultad;
     }
 
     public String getString() throws RemoteException {
-        return String.format("Código: %d, Carrera: %s, Facultad: %d",
-                codcarrera, nombrecarrera, facultad);
+        return String.format("IdCarrera: %d, NombreCarrera: %s, IdFacultad: %d", idcarrera, nombrecarrera, idfacultad);
     }
 
     public static ICarrera fromMap(Map<String, Object> map) throws RemoteException {
         ICarrera carrera = new Carrera();
 
-        if (map.containsKey("Código")) {
-            carrera.setCodCarrera((Integer) map.get("Código"));
+        if (map.containsKey("IdCarrera")) {
+            carrera.setIdCarrera((Integer) map.get("IdCarrera"));
         }
 
-        if (map.containsKey("Carrera")) {
-            carrera.setNombreCarrera((String) map.get("Nombre"));
+        if (map.containsKey("NombreCarrera")) {
+            carrera.setNombreCarrera((String) map.get("NombreCarrera"));
         }
 
-        if (map.containsKey("Facultad")) {
-            carrera.setFacultad((Integer) map.get("Facultad"));
+        if (map.containsKey("IdFacultad")) {
+            carrera.setIdFacultad((Integer) map.get("IdFacultad"));
         }
 
         return carrera;
@@ -73,14 +71,14 @@ public class Carrera extends UnicastRemoteObject implements ICarrera {
     public static Map<String, Object> toMap(ICarrera carrera) throws RemoteException {
         Map<String, Object> datos = new HashMap<>();
 
-        if (carrera.getCodCarrera() != 0) {
-            datos.put("Codigo", carrera.getCodCarrera());
+        if (carrera.getIdCarrera() != 0) {
+            datos.put("IdCarrera", carrera.getIdCarrera());
         }
         if (carrera.getNombreCarrera() != null) {
-            datos.put("Carrera", carrera.getNombreCarrera());
+            datos.put("NombreCarrera", carrera.getNombreCarrera());
         }
-        if (carrera.getFacultad() != 0) {
-            datos.put("Facultad", carrera.getFacultad());
+        if (carrera.getIdFacultad() != 0) {
+            datos.put("IdFacultad", carrera.getIdFacultad());
         }
 
         return datos;

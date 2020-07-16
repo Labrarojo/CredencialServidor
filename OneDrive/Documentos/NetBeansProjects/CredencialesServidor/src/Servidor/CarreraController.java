@@ -23,8 +23,8 @@ public class CarreraController extends UnicastRemoteObject implements ICarreraCo
     }
 
     public int add(ICarrera carrera) throws RemoteException {
-        ICarrera carreraEncontrada = findOne(carrera.getCodCarrera());
-        boolean existe = carreraEncontrada.getCodCarrera() != 0;
+        ICarrera carreraEncontrada = findOne(carrera.getIdCarrera());
+        boolean existe = carreraEncontrada.getIdCarrera() != 0;
 
         if (existe) {
             return ADD_ID_DUPLICADO;
@@ -37,35 +37,33 @@ public class CarreraController extends UnicastRemoteObject implements ICarreraCo
         return (respuesta > 0) ? ADD_EXITO : ADD_SIN_EXITO;
     }
 
-    @Override
     public int update(ICarrera carrera) throws RemoteException {
-        if (carrera.getCodCarrera() == 0) {
+        if (carrera.getIdCarrera() == 0) {
             return UPDATE_ID_NULO;
         }
 
-        ICarrera carreraEncontrada = findOne(carrera.getCodCarrera());
-        if (carreraEncontrada.getCodCarrera() == 0) {
+        ICarrera carreraEncontrada = findOne(carrera.getIdCarrera());
+        if (carreraEncontrada.getIdCarrera() == 0) {
             return UPDATE_ID_INEXISTE;
         }
 
         Map<String, Object> datos = Carrera.toMap(carrera);
         Map<String, Object> where = new HashMap<>();
-        where.put("CodCarrera", carrera.getCodCarrera());
+        where.put("IdCarrera", carrera.getIdCarrera());
         int respuesta = dbManager.actualizar(TABLE, datos, where);
 
         return (respuesta > 0) ? UPDATE_EXITO : UPDATE_SIN_EXITO;
 
     }
 
-    @Override
     public int delete(ICarrera carrera) throws RemoteException {
-        ICarrera carreraTemp = findOne(carrera.getCodCarrera());
-        if (carreraTemp.getCodCarrera() == 0) {
+        ICarrera carreraTemp = findOne(carrera.getIdCarrera());
+        if (carreraTemp.getIdCarrera() == 0) {
             return DELETE_ID_INEXISTENTE;
         }
 
         Map<String, Object> where = new HashMap<>();
-        where.put("CodCarrera", carrera.getCodCarrera());
+        where.put("IdCarrera", carrera.getIdCarrera());
 
         int respuesta = dbManager.eliminar(TABLE, where);
 
@@ -76,14 +74,28 @@ public class CarreraController extends UnicastRemoteObject implements ICarreraCo
         }
     }
 
-    @Override
-    public int delete(int CodCarrera) throws RemoteException {
+    public int delete(int IdCarrera) throws RemoteException {
         ICarrera carrera = new Carrera();
-        carrera.setCodCarrera(CodCarrera);
+        carrera.setIdCarrera(IdCarrera);
         return delete(carrera);
     }
 
-    @Override
+    public int delete(String nombreCarrera) throws RemoteException {
+        ICarrera carreraTemp = findOne(nombreCarrera);
+        if (carreraTemp.getIdCarrera() == 0) {
+            return DELETE_ID_INEXISTENTE;
+        }
+        Map<String, Object> where = new HashMap<>();
+        where.put("NombreCarrera", nombreCarrera);
+
+        int respuesta = dbManager.eliminar(TABLE, where);
+        if (respuesta == 0) {
+            return DELETE_SIN_EXITO;
+        } else {
+            return DELETE_EXITO;
+        }
+    }
+
     public List<ICarrera> list() throws RemoteException {
         List<ICarrera> listaICarrera = new ArrayList<>();
 
@@ -99,17 +111,23 @@ public class CarreraController extends UnicastRemoteObject implements ICarreraCo
 
     }
 
-    @Override
-    public ICarrera findOne(int codCarrera) throws RemoteException {
+    public ICarrera findOne(int idCarrera) throws RemoteException {
 
         Map<String, Object> where = new HashMap<>();
-        where.put("CodCarrera", codCarrera);
+        where.put("IdCarrera", idCarrera);
         Map<String, Object> registro = dbManager.buscarUno(TABLE, where);
 
         return Carrera.fromMap(registro);
     }
 
-    @Override
+    public ICarrera findOne(String nombreCarrera) throws RemoteException {
+        Map<String, Object> where = new HashMap<>();
+        where.put("NombreCarrera", nombreCarrera);
+        Map<String, Object> registro = dbManager.buscarUno(TABLE, where);
+
+        return Carrera.fromMap(registro);
+    }
+
     public List<ICarrera> find(ICarrera carrera) throws RemoteException {
         List<ICarrera> listaICarrera = new ArrayList<>();
 
@@ -126,12 +144,4 @@ public class CarreraController extends UnicastRemoteObject implements ICarreraCo
 
     }
 
-    @Override
-    public ICarrera findOne(String nombreCarrera) throws RemoteException {
-        Map<String, Object> where = new HashMap<>();
-        where.put("carrera", nombreCarrera);
-        Map<String, Object> registro = dbManager.buscarUno(TABLE, where);
-
-        return Carrera.fromMap(registro);
-    }
 }
