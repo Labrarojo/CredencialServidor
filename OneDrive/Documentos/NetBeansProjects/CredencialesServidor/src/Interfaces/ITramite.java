@@ -12,26 +12,14 @@ public interface ITramite extends Remote {
     String getMatricula() throws RemoteException;
 
     void setMatricula(String matricula) throws RemoteException;
-    
-    int getCarrera() throws RemoteException;
-
-    void setCarrera(int carrera) throws RemoteException;
 
     String getFecha() throws RemoteException;
 
     void setFecha(String fecha) throws RemoteException;
 
-    String getFoto() throws RemoteException;
+    String getEstado() throws RemoteException;
 
-    void setFoto(String foto) throws RemoteException;
-
-    String getFirma() throws RemoteException;
-
-    void setFirma(String firma) throws RemoteException;
-
-    boolean getEstado() throws RemoteException;
-
-    void setEstado(boolean estado) throws RemoteException;
+    void setEstado(String estado) throws RemoteException;
 
     String getString() throws RemoteException;
 

@@ -12,18 +12,16 @@ import java.util.Map;
 public class EstudianteController extends UnicastRemoteObject implements IEstudianteController {
 
     private DBManager dbManager;
-    private final String TABLE = "Estudiantes";
+    private final String TABLE = "ESTUDIANTE";
 
     public EstudianteController() throws RemoteException {
         dbManager = new DBManager();
     }
 
-    @Override
     public IEstudiante newInstance() throws RemoteException {
         return new Estudiante();
     }
 
-    @Override
     public int add(IEstudiante estudiante) throws RemoteException {
         IEstudiante estudianteEncontrado = findOne(estudiante.getMatricula());
         boolean existe = estudianteEncontrado.getMatricula() != null;
@@ -36,7 +34,6 @@ public class EstudianteController extends UnicastRemoteObject implements IEstudi
         return (respuesta > 0) ? ADD_EXITO : ADD_SIN_EXITO;
     }
 
-    @Override
     public int update(IEstudiante estudiante) throws RemoteException {
         if (estudiante.getMatricula() == null) {
             return UPDATE_ESTUDIANTE_NULO;
@@ -49,7 +46,7 @@ public class EstudianteController extends UnicastRemoteObject implements IEstudi
 
         Map<String, Object> datos = Estudiante.toMap(estudiante);
         Map<String, Object> where = new HashMap<>();
-        where.put("matricula", estudiante.getMatricula());
+        where.put("Matricula", estudiante.getMatricula());
         int respuesta = dbManager.actualizar(TABLE, datos, where);
         if (respuesta > 0) {
             return UPDATE_EXITO;
@@ -58,7 +55,6 @@ public class EstudianteController extends UnicastRemoteObject implements IEstudi
         }
     }
 
-    @Override
     public int delete(IEstudiante estudiante) throws RemoteException {
         IEstudiante estudianteTemp = findOne(estudiante.getMatricula());
         if (estudianteTemp.getMatricula() == null) {
@@ -66,7 +62,7 @@ public class EstudianteController extends UnicastRemoteObject implements IEstudi
         }
 
         Map<String, Object> where = new HashMap<>();
-        where.put("matricula", estudiante.getMatricula());
+        where.put("Matricula", estudiante.getMatricula());
         int respuesta = dbManager.eliminar(TABLE, where);
 
         if (respuesta == 0) {
@@ -76,7 +72,6 @@ public class EstudianteController extends UnicastRemoteObject implements IEstudi
         }
     }
 
-    @Override
     public int delete(String matricula) throws RemoteException {
         IEstudiante estudianteTemp = findOne(matricula);
         if (estudianteTemp.getMatricula() == null) {
@@ -84,7 +79,7 @@ public class EstudianteController extends UnicastRemoteObject implements IEstudi
         }
 
         Map<String, Object> where = new HashMap<>();
-        where.put("matricula", matricula);
+        where.put("Matricula", matricula);
         int respuesta = dbManager.eliminar(TABLE, where);
 
         if (respuesta == 0) {
@@ -94,7 +89,6 @@ public class EstudianteController extends UnicastRemoteObject implements IEstudi
         }
     }
 
-    @Override
     public List<IEstudiante> list() throws RemoteException {
         List<IEstudiante> listaIEstudiante = new ArrayList<>();
 
@@ -109,16 +103,14 @@ public class EstudianteController extends UnicastRemoteObject implements IEstudi
         return listaIEstudiante;
     }
 
-    @Override
     public IEstudiante findOne(String matricula) throws RemoteException {
         Map<String, Object> where = new HashMap<>();
-        where.put("matricula", matricula);
+        where.put("Matricula", matricula);
         Map<String, Object> registro = dbManager.buscarUno(TABLE, where);
 
         return Estudiante.fromMap(registro);
     }
 
-    @Override
     public List<IEstudiante> find(IEstudiante estudiante) throws RemoteException {
         List<IEstudiante> listaIEstudiante = new ArrayList<>();
 

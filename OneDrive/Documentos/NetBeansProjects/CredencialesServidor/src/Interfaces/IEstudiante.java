@@ -5,9 +5,21 @@ import java.rmi.RemoteException;
 
 public interface IEstudiante extends Remote {
 
-    String getNombre() throws RemoteException;
+    String getMatricula() throws RemoteException;
 
-    void setNombre(String nombreAlumno) throws RemoteException;
+    void setMatricula(String matricula) throws RemoteException;
+
+    int getIdFacultad() throws RemoteException;
+
+    void setIdFacultad(int idFacultad) throws RemoteException;
+
+    int getIdCarrera() throws RemoteException;
+
+    void setIdCarrera(int idCarrera) throws RemoteException;
+
+    String getNombres() throws RemoteException;
+
+    void setNombres(String nombres) throws RemoteException;
 
     String getApellidoPaterno() throws RemoteException;
 
@@ -17,19 +29,6 @@ public interface IEstudiante extends Remote {
 
     void setApellidoMaterno(String apellidoMaterno) throws RemoteException;
 
-    String getMatricula() throws RemoteException;
-
-    void setMatricula(String matricula) throws RemoteException;
-
-    int getProgramaEducativo() throws RemoteException;
-
-    void setProgramaEducativo(int programaEducativo) throws RemoteException;
-
-    int getFacultad() throws RemoteException;
-
-    void setFacultad(int facultad) throws RemoteException;
-
-    //Foto y firma ¿? 
     String getFoto() throws RemoteException;
 
     void setFoto(String foto) throws RemoteException;
@@ -37,5 +36,4 @@ public interface IEstudiante extends Remote {
     String getFirma() throws RemoteException;
 
     void setFirma(String firma) throws RemoteException;
-
 }

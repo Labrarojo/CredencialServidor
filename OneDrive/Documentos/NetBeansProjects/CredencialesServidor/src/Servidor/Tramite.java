@@ -10,84 +10,54 @@ public class Tramite extends UnicastRemoteObject implements ITramite {
 
     private int folio;
     private String matricula;
-    private int carrera;
     private String fecha;
-    private String foto;
-    private String firma;
-    private boolean estado;
+    private String estado;
 
     public Tramite() throws RemoteException {
 
     }
 
-    public Tramite(int folio, String matricula, int carrera, String fecha, String foto, String firma, boolean estado) throws RemoteException{
+    public Tramite(int folio, String matricula, String fecha, String estado) throws RemoteException {
         this.folio = folio;
         this.matricula = matricula;
-        this.carrera = carrera;
         this.fecha = fecha;
-        this.foto = foto;
-        this.firma = firma;
         this.estado = estado;
     }
 
-    public int getFolio() throws RemoteException{
+    public int getFolio() throws RemoteException {
         return folio;
     }
 
-    public void setFolio(int folio) throws RemoteException{
+    public void setFolio(int folio) throws RemoteException {
         this.folio = folio;
     }
 
-    public String getMatricula() throws RemoteException{
+    public String getMatricula() throws RemoteException {
         return matricula;
     }
 
-    public void setMatricula(String matricula) throws RemoteException{
+    public void setMatricula(String matricula) throws RemoteException {
         this.matricula = matricula;
     }
 
-    public int getCarrera() throws RemoteException{
-        return carrera;
-    }
-
-    public void setCarrera(int carrera) throws RemoteException{
-        this.carrera = carrera;
-    }
-
-    public String getFecha() throws RemoteException{
+    public String getFecha() throws RemoteException {
         return fecha;
     }
 
-    public void setFecha(String fecha) throws RemoteException{
+    public void setFecha(String fecha) throws RemoteException {
         this.fecha = fecha;
     }
 
-    public String getFoto() throws RemoteException{
-        return foto;
-    }
-
-    public void setFoto(String foto) throws RemoteException{
-        this.foto = foto;
-    }
-
-    public String getFirma() throws RemoteException{
-        return firma;
-    }
-
-    public void setFirma(String firma) throws RemoteException{
-        this.firma = firma;
-    }
-
-    public boolean getEstado() throws RemoteException{
+    public String getEstado() throws RemoteException {
         return estado;
     }
 
-    public void setEstado(boolean estado) throws RemoteException{
+    public void setEstado(String estado) throws RemoteException {
         this.estado = estado;
     }
 
     public String getString() throws RemoteException {
-        return String.format("Folio: %d, Matricula: %s, Carrera: %s, Fecha: %s, Foto: %s, Firma: %s, Estado: %s", folio, matricula, carrera, fecha, foto, firma, estado);
+        return String.format("Folio: %d, Matricula: %s, Fecha: %s, Estado: %s", folio, matricula, fecha, estado);
     }
 
     public static ITramite fromMap(Map<String, Object> map) throws RemoteException {
@@ -96,23 +66,14 @@ public class Tramite extends UnicastRemoteObject implements ITramite {
         if (map.containsKey("Folio")) {
             tramite.setFolio((Integer) map.get("Folio"));
         }
-        if (map.containsKey("Estudiante")) {
-            tramite.setMatricula((String) map.get("Estudiante"));
-        }
-        if (map.containsKey("Carrera")) {
-            tramite.setCarrera((Integer) map.get("Carrera"));
+        if (map.containsKey("Matricula")) {
+            tramite.setMatricula((String) map.get("Matricula"));
         }
         if (map.containsKey("Fecha")) {
             tramite.setFecha((String) map.get("Fecha"));
         }
-        if (map.containsKey("Foto")) {
-            tramite.setFoto((String) map.get("Foto"));
-        }
-        if (map.containsKey("Firma")) {
-            tramite.setFirma((String) map.get("Firma"));
-        }
         if (map.containsKey("Estado")) {
-            tramite.setEstado((Boolean) map.get("Estado"));
+            tramite.setEstado((String) map.get("Estado"));
         }
 
         return tramite;
@@ -125,21 +86,12 @@ public class Tramite extends UnicastRemoteObject implements ITramite {
             datos.put("Folio", tramite.getFolio());
         }
         if (tramite.getMatricula() != null) {
-            datos.put("Estudiante", tramite.getMatricula());
-        }
-        if (tramite.getCarrera() != 0) {
-            datos.put("Carrera", tramite.getCarrera());
+            datos.put("Matricula", tramite.getMatricula());
         }
         if (tramite.getFecha() != null) {
             datos.put("Fecha", tramite.getFecha());
         }
-        if (tramite.getFoto() != null) {
-            datos.put("Foto", tramite.getFoto());
-        }
-        if (tramite.getFirma() != null) {
-            datos.put("Firma", tramite.getFirma());
-        }
-        if (tramite.getEstado() != false) {
+        if (tramite.getEstado() != null) {
             datos.put("Estado", tramite.getEstado());
         }
 

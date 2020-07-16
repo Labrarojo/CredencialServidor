@@ -10,141 +10,58 @@ public class Estudiante extends UnicastRemoteObject implements IEstudiante {
 
     private String foto;
     private String firma;
-    private String nombre;
+    private String nombres;
     private String apellidoPaterno;
     private String apellidoMaterno;
     private String matricula;
-    private int programaEducativo;
-    private int facultad;
+    private int idCarrera;
+    private int idFacultad;
 
     public Estudiante() throws RemoteException {
 
     }
 
-    public Estudiante(String foto, String firma, String nombre, String apellidoPaterno, String apellidoMaterno, String matricula, int programaEducativo, int facultad) throws RemoteException {
+    public Estudiante(String foto, String firma, String nombres, String apellidoPaterno, String apellidoMaterno, String matricula, int idCarrera, int idFacultad) throws RemoteException {
         this.foto = foto;
         this.firma = firma;
-        this.nombre = nombre;
+        this.nombres = nombres;
         this.apellidoPaterno = apellidoPaterno;
         this.apellidoMaterno = apellidoMaterno;
         this.matricula = matricula;
-        this.programaEducativo = programaEducativo;
-        this.facultad = facultad;
+        this.idCarrera = idCarrera;
+        this.idFacultad = idFacultad;
     }
 
-    @Override
-    public String getNombre() throws RemoteException {
-        return nombre;
-    }
-
-    @Override
-    public void setNombre(String nombre) throws RemoteException {
-        this.nombre = nombre;
-    }
-
-    @Override
     public String getMatricula() throws RemoteException {
         return matricula;
     }
 
-    @Override
     public void setMatricula(String matricula) throws RemoteException {
         this.matricula = matricula;
     }
 
-    @Override
-    public int getProgramaEducativo() throws RemoteException {
-        return programaEducativo;
+    public int getIdCarrera() throws RemoteException {
+        return idCarrera;
     }
 
-    @Override
-    public void setProgramaEducativo(int programaEducativo) throws RemoteException {
-        this.programaEducativo = programaEducativo;
+    public void setIdCarrera(int idCarrera) throws RemoteException {
+        this.idCarrera = idCarrera;
     }
 
-    @Override
-    public int getFacultad() throws RemoteException {
-        return facultad;
+    public int getIdFacultad() throws RemoteException {
+        return idFacultad;
     }
 
-    @Override
-    public void setFacultad(int facultad) throws RemoteException {
-        this.facultad = facultad;
+    public void setIdFacultad(int idFacultad) throws RemoteException {
+        this.idFacultad = idFacultad;
     }
 
-    public String getString() {
-        return String.format("nombreAlumno: %s \napellido paterno: %s \napellido materno: %s \nmatricula: %s \nprogramaEducativo: %d \nfacultad: %d", nombre, apellidoPaterno, apellidoMaterno, matricula, programaEducativo, facultad);
+    public String getNombres() throws RemoteException {
+        return nombres;
     }
 
-    public static IEstudiante fromMap(Map<String, Object> map) throws RemoteException {
-        IEstudiante estudiante = new Estudiante();
-
-        if (map.containsKey("nombres")) {
-            estudiante.setNombre((String) map.get("nombres"));
-        }
-        if (map.containsKey("ApellidoPaterno")) {
-            estudiante.setApellidoPaterno((String) map.get("ApellidoPaterno"));
-        }
-        if (map.containsKey("ApellidoMaterno")) {
-            estudiante.setApellidoMaterno((String) map.get("ApellidoMaterno"));
-        }
-
-        if (map.containsKey("matricula")) {
-            estudiante.setMatricula((String) map.get("matricula"));
-        }
-
-        if (map.containsKey("programaEducativo")) {
-            estudiante.setProgramaEducativo((Integer) map.get("programaEducativo"));
-        }
-
-        if (map.containsKey("facultad")) {
-            estudiante.setFacultad((Integer) map.get("facultad"));
-        }
-
-        return estudiante;
-    }
-
-    public static Map<String, Object> toMap(IEstudiante estudiante) throws RemoteException {
-        Map<String, Object> datos = new HashMap<>();
-        if (estudiante.getNombre() != null) {
-            datos.put("nombres", estudiante.getNombre());
-        }
-        if (estudiante.getApellidoPaterno()!= null) {
-            datos.put("ApellidoPaterno", estudiante.getApellidoPaterno());
-        }
-        if (estudiante.getApellidoMaterno()!= null) {
-            datos.put("ApellidoMaterno", estudiante.getApellidoMaterno());
-        }
-        if (estudiante.getMatricula() != null) {
-            datos.put("matricula", estudiante.getMatricula());
-        }
-        if (estudiante.getProgramaEducativo() != 0) {
-            datos.put("programaEducativo", estudiante.getProgramaEducativo());
-        }
-        if (estudiante.getFacultad() != 0) {
-            datos.put("facultad", estudiante.getFacultad());
-        }
-        return datos;
-    }
-
-    @Override
-    public String getFoto() throws RemoteException {
-        return foto;
-    }
-
-    @Override
-    public void setFoto(String foto) throws RemoteException {
-        this.foto = foto;
-    }
-
-    @Override
-    public String getFirma() throws RemoteException {
-        return foto;
-    }
-
-    @Override
-    public void setFirma(String firma) throws RemoteException {
-        this.foto = firma;
+    public void setNombres(String nombres) throws RemoteException {
+        this.nombres = nombres;
     }
 
     public String getApellidoPaterno() {
@@ -161,6 +78,88 @@ public class Estudiante extends UnicastRemoteObject implements IEstudiante {
 
     public void setApellidoMaterno(String apellidoMaterno) {
         this.apellidoMaterno = apellidoMaterno;
+    }
+
+    public String getFoto() throws RemoteException {
+        return foto;
+    }
+
+    public void setFoto(String foto) throws RemoteException {
+        this.foto = foto;
+    }
+
+    public String getFirma() throws RemoteException {
+        return foto;
+    }
+
+    public void setFirma(String firma) throws RemoteException {
+        this.foto = firma;
+    }
+
+    public String getString() {
+        return String.format("nombreAlumno: %s \napellido paterno: %s \napellido materno: %s \nmatricula: %s \nprogramaEducativo: %d \nfacultad: %d", nombres, apellidoPaterno, apellidoMaterno, matricula, idCarrera, idFacultad);
+    }
+
+    public static IEstudiante fromMap(Map<String, Object> map) throws RemoteException {
+        IEstudiante estudiante = new Estudiante();
+
+        if (map.containsKey("Matricula")) {
+            estudiante.setMatricula((String) map.get("Matricula"));
+        }
+        if (map.containsKey("IdFacultad")) {
+            estudiante.setIdFacultad((Integer) map.get("IdFacultad"));
+        }
+        if (map.containsKey("IdCarrera")) {
+            estudiante.setIdCarrera((Integer) map.get("IdCarrera"));
+        }
+        if (map.containsKey("Nombres")) {
+            estudiante.setNombres((String) map.get("Nombres"));
+        }
+        if (map.containsKey("ApellidoPaterno")) {
+            estudiante.setApellidoPaterno((String) map.get("ApellidoPaterno"));
+        }
+        if (map.containsKey("ApellidoMaterno")) {
+            estudiante.setApellidoMaterno((String) map.get("ApellidoMaterno"));
+        }
+        if (map.containsKey("Foto")) {
+            estudiante.setFoto((String) map.get("Foto"));
+        }
+        if (map.containsKey("Firma")) {
+            estudiante.setFirma((String) map.get("Firma"));
+        }
+
+        return estudiante;
+    }
+
+    public static Map<String, Object> toMap(IEstudiante estudiante) throws RemoteException {
+        Map<String, Object> datos = new HashMap<>();
+
+        if (estudiante.getMatricula() != null) {
+            datos.put("Matricula", estudiante.getMatricula());
+        }
+        if (estudiante.getIdFacultad() != 0) {
+            datos.put("IdFacultad", estudiante.getIdFacultad());
+        }
+        if (estudiante.getIdCarrera() != 0) {
+            datos.put("IdCarrera", estudiante.getIdCarrera());
+        }
+        if (estudiante.getNombres() != null) {
+            datos.put("Nombres", estudiante.getNombres());
+        }
+        if (estudiante.getApellidoPaterno() != null) {
+            datos.put("ApellidoPaterno", estudiante.getApellidoPaterno());
+        }
+        if (estudiante.getApellidoMaterno() != null) {
+            datos.put("ApellidoMaterno", estudiante.getApellidoMaterno());
+        }
+        if (estudiante.getFoto()!= null) {
+            datos.put("Foto", estudiante.getFoto());
+        }
+        if (estudiante.getFirma()!= null) {
+            datos.put("Firma", estudiante.getFirma());
+        }
+
+        return datos;
     }
 
 }

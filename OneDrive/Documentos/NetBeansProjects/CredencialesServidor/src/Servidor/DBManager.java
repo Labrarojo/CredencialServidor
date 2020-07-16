@@ -26,7 +26,7 @@ public class DBManager {
     }
 
     public DBManager() {
-        String url = "jdbc:sqlite:C:\\Users\\SORS\\OneDrive\\Documentos\\NetBeansProjects\\TiendaServidor\\Tienda.db";
+        String url = "jdbc:sqlite:C:\\Users\\SORS\\OneDrive\\Documentos\\NetBeansProjects\\CredencialesServidor\\db-SICAuv.sqlite";
         try {
             conexion = DriverManager.getConnection(url);
             System.out.println("Conexión a BD exitosa.");
