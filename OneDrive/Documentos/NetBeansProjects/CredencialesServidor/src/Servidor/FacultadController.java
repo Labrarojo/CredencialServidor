@@ -50,7 +50,7 @@ public class FacultadController extends UnicastRemoteObject implements IFacultad
 
         Map<String, Object> datos = Facultad.toMap(facultad);
         Map<String, Object> where = new HashMap<>();
-        where.put("CodFacultad", facultad.getId());
+        where.put("IdFacultad", facultad.getId());
         int respuesta = dbManager.actualizar(TABLE, datos, where);
 
         return (respuesta > 0) ? UPDATE_EXITO : UPDATE_SIN_EXITO;
@@ -78,7 +78,7 @@ public class FacultadController extends UnicastRemoteObject implements IFacultad
             return DELETE_ID_INEXISTE;
         }
         Map<String, Object> where = new HashMap<>();
-        where.put("NombreFac", nombreFacultad);
+        where.put("NombreFacultad", nombreFacultad);
 
         int respuesta = dbManager.eliminar(TABLE, where);
         if (respuesta == 0) {
@@ -94,7 +94,7 @@ public class FacultadController extends UnicastRemoteObject implements IFacultad
             return DELETE_ID_INEXISTE;
         }
         Map<String, Object> where = new HashMap<>();
-        where.put("CodFacultad", idFacultad);
+        where.put("IdFacultad", idFacultad);
 
         int respuesta = dbManager.eliminar(TABLE, where);
         if (respuesta == 0) {
@@ -121,7 +121,7 @@ public class FacultadController extends UnicastRemoteObject implements IFacultad
 
     public IFacultad findOne(int idFacultad) throws RemoteException {
         Map<String, Object> where = new HashMap<>();
-        where.put("CodFacultad", idFacultad);
+        where.put("IdFacultad", idFacultad);
         Map<String, Object> registro = dbManager.buscarUno(TABLE, where);
 
         return Facultad.fromMap(registro);
@@ -129,7 +129,7 @@ public class FacultadController extends UnicastRemoteObject implements IFacultad
 
     public IFacultad findOne(String nombreFacultad) throws RemoteException {
         Map<String, Object> where = new HashMap<>();
-        where.put("NombreFac", nombreFacultad);
+        where.put("NombreFacultad", nombreFacultad);
         Map<String, Object> registro = dbManager.buscarUno(TABLE, where);
 
         return Facultad.fromMap(registro);

@@ -9,10 +9,6 @@ public interface IFacultad extends Remote {
 
     void setId(int id) throws RemoteException;
 
-    String getSecretario() throws RemoteException;
-
-    void setSecretario(String secretario) throws RemoteException;
-
     String getFacultad() throws RemoteException;
 
     void setFacultad(String facultad) throws RemoteException;
