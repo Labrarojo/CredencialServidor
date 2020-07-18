@@ -22,7 +22,7 @@ public class Servidor {
             IEstudianteController estudianteController = new EstudianteController();
             ICarreraController carreraController = new CarreraController();
             ITramiteController tramiteController = new TramiteController();
-            Naming.rebind("rmi://localhost/facultadscontroller", (facultadController));
+            Naming.rebind("rmi://localhost/facultadcontroller", (facultadController));
             Naming.rebind("rmi://localhost/secretariocontroller", (secretarioController));
             Naming.rebind("rmi://localhost/estudiantecontroller", (estudianteController));
             Naming.rebind("rmi://localhost/carreracontroller", (carreraController));

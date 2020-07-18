@@ -3,13 +3,14 @@ package Servidor;
 import Interfaces.IEstudiante;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.sql.Blob;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Estudiante extends UnicastRemoteObject implements IEstudiante {
 
-    private String foto;
-    private String firma;
+    private Blob foto;
+    private Blob firma;
     private String nombres;
     private String apellidoPaterno;
     private String apellidoMaterno;
@@ -21,7 +22,7 @@ public class Estudiante extends UnicastRemoteObject implements IEstudiante {
 
     }
 
-    public Estudiante(String foto, String firma, String nombres, String apellidoPaterno, String apellidoMaterno, String matricula, int idCarrera, int idFacultad) throws RemoteException {
+    public Estudiante(Blob foto, Blob firma, String nombres, String apellidoPaterno, String apellidoMaterno, String matricula, int idCarrera, int idFacultad) throws RemoteException {
         this.foto = foto;
         this.firma = firma;
         this.nombres = nombres;
@@ -80,19 +81,19 @@ public class Estudiante extends UnicastRemoteObject implements IEstudiante {
         this.apellidoMaterno = apellidoMaterno;
     }
 
-    public String getFoto() throws RemoteException {
+    public Blob getFoto() throws RemoteException {
         return foto;
     }
 
-    public void setFoto(String foto) throws RemoteException {
+    public void setFoto(Blob foto) throws RemoteException {
         this.foto = foto;
     }
 
-    public String getFirma() throws RemoteException {
+    public Blob getFirma() throws RemoteException {
         return foto;
     }
 
-    public void setFirma(String firma) throws RemoteException {
+    public void setFirma(Blob firma) throws RemoteException {
         this.foto = firma;
     }
 
@@ -122,10 +123,10 @@ public class Estudiante extends UnicastRemoteObject implements IEstudiante {
             estudiante.setApellidoMaterno((String) map.get("ApellidoMaterno"));
         }
         if (map.containsKey("Foto")) {
-            estudiante.setFoto((String) map.get("Foto"));
+            estudiante.setFoto((Blob) map.get("Foto"));
         }
         if (map.containsKey("Firma")) {
-            estudiante.setFirma((String) map.get("Firma"));
+            estudiante.setFirma((Blob) map.get("Firma"));
         }
 
         return estudiante;

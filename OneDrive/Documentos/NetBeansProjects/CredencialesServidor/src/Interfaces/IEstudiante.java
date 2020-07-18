@@ -2,6 +2,7 @@ package Interfaces;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.sql.Blob;
 
 public interface IEstudiante extends Remote {
 
@@ -29,11 +30,11 @@ public interface IEstudiante extends Remote {
 
     void setApellidoMaterno(String apellidoMaterno) throws RemoteException;
 
-    String getFoto() throws RemoteException;
+    Blob getFoto() throws RemoteException;
 
-    void setFoto(String foto) throws RemoteException;
+    void setFoto(Blob foto) throws RemoteException;
 
-    String getFirma() throws RemoteException;
+    Blob getFirma() throws RemoteException;
 
-    void setFirma(String firma) throws RemoteException;
+    void setFirma(Blob firma) throws RemoteException;
 }
