@@ -17,6 +17,7 @@ public class DBManager {
 
     private Connection conexion;
     private static DBManager dbManager;
+    private static String ruta = (System.getProperty("user.dir") + "\\db-SICAuv.sqlite");
 
     public static DBManager getInstance() {
         if (dbManager == null) {
@@ -26,7 +27,7 @@ public class DBManager {
     }
 
     public DBManager() {
-        String url = "jdbc:sqlite:C:\\Users\\SORS\\OneDrive\\Documentos\\NetBeansProjects\\CredencialesServidor\\db-SICAuv.sqlite";
+        String url = "jdbc:sqlite:"+ruta;
         try {
             conexion = DriverManager.getConnection(url);
             System.out.println("Conexión a BD exitosa.");

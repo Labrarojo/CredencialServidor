@@ -15,7 +15,7 @@ public class CarreraController extends UnicastRemoteObject implements ICarreraCo
     private final String TABLE = "CARRERA";
 
     public CarreraController() throws RemoteException {
-        dbManager = new DBManager();
+        dbManager = DBManager.getInstance();
     }
 
     public ICarrera newInstance() throws RemoteException {

@@ -15,7 +15,7 @@ public class EstudianteController extends UnicastRemoteObject implements IEstudi
     private final String TABLE = "ESTUDIANTE";
 
     public EstudianteController() throws RemoteException {
-        dbManager = new DBManager();
+        dbManager = DBManager.getInstance();
     }
 
     public IEstudiante newInstance() throws RemoteException {

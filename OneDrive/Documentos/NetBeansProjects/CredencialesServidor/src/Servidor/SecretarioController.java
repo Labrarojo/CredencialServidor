@@ -15,7 +15,7 @@ public class SecretarioController extends UnicastRemoteObject implements ISecret
     private final String TABLE = "SECRETARIO";
 
     public SecretarioController() throws RemoteException {
-        dbManager = new DBManager();
+        dbManager = DBManager.getInstance();
     }
 
     public ISecretario newInstance() throws RemoteException {
