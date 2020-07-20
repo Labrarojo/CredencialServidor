@@ -1,25 +1,33 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package gui;
 
+import Iniciador.RMI;
+import Interfaces.IFacultad;
+import Interfaces.ISecretario;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
+import Interfaces.ISecretarioController;
+import java.rmi.RemoteException;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-/**
- *
- * @author adria
- */
 public class EditarSecretaria extends javax.swing.JFrame {
-
-    /**
-     * Creates new form AgregarSecretaria
-     */
+    private ISecretario secretaria;
+    
+    private List<IFacultad> listaFacultad;
     public EditarSecretaria() {
         initComponents();
         setIconImage(new ImageIcon(getClass().getResource("/media/logo.png")).getImage());
         this.setLocationRelativeTo(null);
+        
+        try {
+            listaFacultad = RMI.getIFacultadController().list();
+            for (IFacultad nombreFacultad : listaFacultad) {
+                facultadComboBox.addItem(nombreFacultad.getFacultad());
+            }
+        } catch (RemoteException ex) {
+            Logger.getLogger(AgregarSecretaria.class.getName()).log(Level.SEVERE, null, ex);
+        } 
         
     }
 
@@ -39,7 +47,7 @@ public class EditarSecretaria extends javax.swing.JFrame {
         facultadComboBox = new javax.swing.JComboBox<>();
         paternoTextField = new javax.swing.JTextField();
         jToggleButton1 = new javax.swing.JToggleButton();
-        jPasswordField1 = new javax.swing.JPasswordField();
+        contraseñaPasswordField = new javax.swing.JPasswordField();
         guardarButton = new javax.swing.JButton();
         cancelarButton = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
@@ -98,25 +106,35 @@ public class EditarSecretaria extends javax.swing.JFrame {
         });
         getContentPane().add(jToggleButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(980, 530, 50, 40));
 
-        jPasswordField1.setBackground(new java.awt.Color(220, 236, 246));
-        jPasswordField1.setFont(new java.awt.Font("Tw Cen MT", 0, 30)); // NOI18N
-        jPasswordField1.setForeground(new java.awt.Color(47, 72, 90));
-        jPasswordField1.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(220, 236, 246), 3, true));
-        jPasswordField1.addActionListener(new java.awt.event.ActionListener() {
+        contraseñaPasswordField.setBackground(new java.awt.Color(220, 236, 246));
+        contraseñaPasswordField.setFont(new java.awt.Font("Tw Cen MT", 0, 30)); // NOI18N
+        contraseñaPasswordField.setForeground(new java.awt.Color(47, 72, 90));
+        contraseñaPasswordField.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(220, 236, 246), 3, true));
+        contraseñaPasswordField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jPasswordField1ActionPerformed(evt);
+                contraseñaPasswordFieldActionPerformed(evt);
             }
         });
-        getContentPane().add(jPasswordField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 520, 450, 60));
+        getContentPane().add(contraseñaPasswordField, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 520, 450, 60));
 
         guardarButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/media/Guardar.png"))); // NOI18N
         guardarButton.setBorder(null);
         guardarButton.setContentAreaFilled(false);
+        guardarButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                guardarButtonActionPerformed(evt);
+            }
+        });
         getContentPane().add(guardarButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 600, 200, 50));
 
         cancelarButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/media/cancelar.png"))); // NOI18N
         cancelarButton.setBorder(null);
         cancelarButton.setContentAreaFilled(false);
+        cancelarButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cancelarButtonActionPerformed(evt);
+            }
+        });
         getContentPane().add(cancelarButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(840, 600, 200, 50));
 
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/media/Editar secretaria – 1.png"))); // NOI18N
@@ -125,16 +143,15 @@ public class EditarSecretaria extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jPasswordField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jPasswordField1ActionPerformed
+    private void contraseñaPasswordFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_contraseñaPasswordFieldActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jPasswordField1ActionPerformed
+    }//GEN-LAST:event_contraseñaPasswordFieldActionPerformed
 
     private void jToggleButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton1ActionPerformed
-        // TODO add your handling code here:
         if (jToggleButton1.isSelected()) {
-            jPasswordField1.setEchoChar((char)0);
+            contraseñaPasswordField.setEchoChar((char)0);
         }else{
-            jPasswordField1.setEchoChar('*');
+            contraseñaPasswordField.setEchoChar('*');
         }
     }//GEN-LAST:event_jToggleButton1ActionPerformed
 
@@ -143,6 +160,131 @@ public class EditarSecretaria extends javax.swing.JFrame {
         this.setVisible(false);
         secretarias.setVisible(true);
     }//GEN-LAST:event_atrasButtonActionPerformed
+
+    private void guardarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guardarButtonActionPerformed
+        try {
+            String nombre = nombreTextField.getText();
+            String apellidoPaterno = paternoTextField.getText();
+            String apellidoMaterno = maternoTextField.getText();
+            String nombreFacultad = (String) facultadComboBox.getSelectedItem();
+            String matricula = matriculaTextField.getText();
+            String contraseña = contraseñaPasswordField.getText();
+            
+            ISecretario secretaria = RMI.getISecretarioController().newInstance();
+            
+            if(nombre.length() == 0){
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Ingrese nombre.", 
+                        "Validación", 
+                        JOptionPane.ERROR_MESSAGE);
+                nombreTextField.requestFocus();
+                return;
+            }else{
+                secretaria.setNombres(nombre);
+            }
+            
+            if(apellidoPaterno.length() == 0){
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Ingrese el apellido paterno.", 
+                        "Validación", 
+                        JOptionPane.ERROR_MESSAGE);
+                paternoTextField.requestFocus();
+                return;
+            }else{
+                secretaria.setApellidoPaterno(apellidoPaterno);
+            }
+            
+            if(apellidoMaterno.length() == 0){
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Ingrese el apellido materno.", 
+                        "Validación", 
+                        JOptionPane.ERROR_MESSAGE);
+                maternoTextField.requestFocus();
+                return;
+            }else{
+                secretaria.setApellidoMaterno(apellidoMaterno);
+            }
+            
+            if (nombreFacultad.length() == 0) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Seleccione una facultad.",
+                        "Validación",
+                        JOptionPane.ERROR_MESSAGE);
+                facultadComboBox.requestFocus();
+                return;
+            } else {
+                for (IFacultad iFacultad : listaFacultad) {
+                    if (iFacultad.getFacultad().equals(nombreFacultad)) {
+                        
+                        secretaria.setIdFacultad(iFacultad.getId());
+                    }
+                }
+            }
+            
+            if(matricula.length() == 0){
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Ingrese la matrícula.", 
+                        "Validación", 
+                        JOptionPane.ERROR_MESSAGE);
+                matriculaTextField.requestFocus();
+                return;
+            }else{
+                secretaria.setMatriculaSecretario(matricula);
+            }
+            
+            if(contraseña.length() == 0){
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Ingrese una contraseña.", 
+                        "Validación", 
+                        JOptionPane.ERROR_MESSAGE);
+                contraseñaPasswordField.requestFocus();
+                return;
+            }else{
+                secretaria.setContraseña(contraseña);
+            }
+
+            int respuesta = RMI.getISecretarioController().update(secretaria);
+
+            if (respuesta == ISecretarioController.UPDATE_EXITO) {
+                JOptionPane.showMessageDialog(this,
+                        "La secretaria ha sido modificado exitosamente.",
+                        "Operación exitosa",
+                        JOptionPane.INFORMATION_MESSAGE);
+                SecretariasRegistradas secretarias = new SecretariasRegistradas();
+                this.setVisible(false);
+                secretarias.setVisible(true);
+            } else if (respuesta == ISecretarioController.UPDATE_SIN_EXITO) {
+                JOptionPane.showMessageDialog(this, "No fue posible completar la operación.", 
+                        "Operación incompleta", 
+                        JOptionPane.ERROR_MESSAGE);
+                
+            } else if (respuesta == ISecretarioController.UPDATE_MATRICULA_INEXISTE) {
+                JOptionPane.showMessageDialog(
+                        this, 
+                        "No fue posible completar la operación.\n" + "La matrícula ingresada no se encuentra registrada.\n",
+                        "Operación incompleta", 
+                        JOptionPane.ERROR_MESSAGE);
+            } //else if (respuesta == ISecretarioController.UPDATE_MATRICULA_NULA){
+                //JOptionPane.showMessageDialog(this, evt, matricula, WIDTH);
+            //}
+
+        } catch (RemoteException ex) {
+            Logger.getLogger(EditarSecretaria.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }//GEN-LAST:event_guardarButtonActionPerformed
+
+    private void cancelarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelarButtonActionPerformed
+        SecretariasRegistradas secretarias = new SecretariasRegistradas();
+        this.setVisible(false);
+        secretarias.setVisible(true);
+    }//GEN-LAST:event_cancelarButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -171,6 +313,8 @@ public class EditarSecretaria extends javax.swing.JFrame {
         }
         //</editor-fold>
         //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -183,10 +327,10 @@ public class EditarSecretaria extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton atrasButton;
     private javax.swing.JButton cancelarButton;
+    private javax.swing.JPasswordField contraseñaPasswordField;
     private javax.swing.JComboBox<String> facultadComboBox;
     private javax.swing.JButton guardarButton;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JPasswordField jPasswordField1;
     private javax.swing.JToggleButton jToggleButton1;
     private javax.swing.JTextField maternoTextField;
     private javax.swing.JTextField matriculaTextField;
