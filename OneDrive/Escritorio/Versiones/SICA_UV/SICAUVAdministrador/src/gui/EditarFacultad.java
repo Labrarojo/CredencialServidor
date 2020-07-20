@@ -5,7 +5,16 @@
  */
 package gui;
 
+import Iniciador.RMI;
+import Interfaces.IFacultad;
+import Interfaces.IFacultadController;
+import java.rmi.RemoteException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
+
+
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -13,13 +22,22 @@ import javax.swing.ImageIcon;
  */
 public class EditarFacultad extends javax.swing.JFrame {
 
-    /**
-     * Creates new form AgregarCarrera
-     */
-    public EditarFacultad() {
-        initComponents();
-        setIconImage(new ImageIcon(getClass().getResource("/media/logo.png")).getImage());
-        this.setLocationRelativeTo(null);
+    private IFacultad facultad;
+   
+    
+    public EditarFacultad( IFacultad facultad ) {
+        try {
+            initComponents();
+            
+            
+            this.facultad = facultad;
+            setIconImage(new ImageIcon(getClass().getResource("/media/logo.png")).getImage());
+            
+            this.setLocationRelativeTo(null);
+            facultadTextField.setText(facultad.getFacultad());
+        } catch (RemoteException ex) {
+            Logger.getLogger(EditarFacultad.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -44,17 +62,32 @@ public class EditarFacultad extends javax.swing.JFrame {
         cancelarButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/media/cancelar.png"))); // NOI18N
         cancelarButton.setBorder(null);
         cancelarButton.setContentAreaFilled(false);
+        cancelarButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cancelarButtonActionPerformed(evt);
+            }
+        });
         getContentPane().add(cancelarButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 510, 200, 50));
 
         guardarButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/media/Guardar.png"))); // NOI18N
         guardarButton.setBorder(null);
         guardarButton.setContentAreaFilled(false);
+        guardarButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                guardarButtonActionPerformed(evt);
+            }
+        });
         getContentPane().add(guardarButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 510, 200, 50));
 
         facultadTextField.setBackground(new java.awt.Color(220, 236, 246));
         facultadTextField.setFont(new java.awt.Font("Tw Cen MT", 0, 24)); // NOI18N
         facultadTextField.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(220, 236, 246), 3, true));
         facultadTextField.setPreferredSize(new java.awt.Dimension(428, 31));
+        facultadTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                facultadTextFieldActionPerformed(evt);
+            }
+        });
         getContentPane().add(facultadTextField, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 290, 800, 90));
 
         atrasButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/media/atras.png"))); // NOI18N
@@ -78,6 +111,51 @@ public class EditarFacultad extends javax.swing.JFrame {
         this.setVisible(false);
         facultades.setVisible(true);
     }//GEN-LAST:event_atrasButtonActionPerformed
+
+    private void guardarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guardarButtonActionPerformed
+        try {
+            String nombre = facultadTextField.getText();
+            
+
+            if ( nombre.length() == 0 ){
+                JOptionPane.showMessageDialog(this, "Ingrese el nombre de la facultad.", "Validación", JOptionPane.ERROR_MESSAGE );
+                facultadTextField.requestFocus();
+                return;
+            }
+            else{
+                facultad.setFacultad(nombre);
+            }
+            
+            int respuesta = RMI.getIFacultadController().update(facultad);
+            if ( respuesta == IFacultadController.UPDATE_EXITO ){
+                JOptionPane.showMessageDialog(this, "El nombre de la facultad ha sido modificado exitosamente.", "Operación exitosa", JOptionPane.INFORMATION_MESSAGE);
+                
+            }
+            else if ( respuesta == IFacultadController.UPDATE_SIN_EXITO){
+                JOptionPane.showMessageDialog(this, "No fue posible completar la operación.", "Operación incompleta", JOptionPane.ERROR_MESSAGE);
+            }
+            else if ( respuesta == IFacultadController.UPDATE_ID_INEXISTE ){
+                JOptionPane.showMessageDialog(this, "No fue posible completar la operación.\n"+"Facultad no encontrada.\n" +"Es probable que la facultad haya sido eliminado anteriormente.", "Operación incompleta", JOptionPane.ERROR_MESSAGE);                
+                this.setVisible(false);
+            }
+        } catch (RemoteException ex) {
+            Logger.getLogger(EditarFacultad.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        FacultadesRegistradas facultades = new FacultadesRegistradas();
+        this.setVisible(false);
+        facultades.setVisible(true);
+        
+    }//GEN-LAST:event_guardarButtonActionPerformed
+
+    private void facultadTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_facultadTextFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_facultadTextFieldActionPerformed
+
+    private void cancelarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelarButtonActionPerformed
+        FacultadesRegistradas facultades = new FacultadesRegistradas();
+        this.setVisible(false);
+        facultades.setVisible(true);
+    }//GEN-LAST:event_cancelarButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -108,11 +186,15 @@ public class EditarFacultad extends javax.swing.JFrame {
         //</editor-fold>
         //</editor-fold>
         //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new EditarFacultad().setVisible(true);
+                //new EditarFacultad().setVisible(true);
             }
         });
     }

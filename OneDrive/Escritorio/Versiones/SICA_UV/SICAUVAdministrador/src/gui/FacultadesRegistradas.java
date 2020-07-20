@@ -5,9 +5,19 @@
  */
 package gui;
 
+import Iniciador.RMI;
+import Interfaces.IFacultad;
+import Interfaces.IFacultadController;
 import java.awt.Color;
 import java.awt.Font;
+import java.rmi.RemoteException;
+import java.util.List;
+import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -15,11 +25,12 @@ import javax.swing.ImageIcon;
  */
 public class FacultadesRegistradas extends javax.swing.JFrame {
 
-    /**
-     * Creates new form SecretariasRegistradas
-     */
+    private static String IDFACULTAD = "Id Facultad";
+    private static String NOMBRE = "Facultad";
+    
     public FacultadesRegistradas() {
         initComponents();
+        refrescarTabla();
         setIconImage(new ImageIcon(getClass().getResource("/media/logo.png")).getImage());
         this.setLocationRelativeTo(null);
         registroFacultadTable.getTableHeader().setFont(new Font("Montserrat", Font.BOLD, 12));
@@ -30,7 +41,30 @@ public class FacultadesRegistradas extends javax.swing.JFrame {
     }
  
     AgregarFacultad agregar = new AgregarFacultad();
-    EditarFacultad editar = new EditarFacultad();
+    
+    public void refrescarTabla() {
+        try {
+            Vector<Vector> datos = new Vector<>();
+
+            List<IFacultad> listaFacultades = RMI.getIFacultadController().list();
+
+            for (IFacultad facultad : listaFacultades) {
+                Vector registro = new Vector();
+                registro.add(facultad.getFacultad());
+
+                datos.add(registro);
+            }
+
+            Vector<String> columnas = new Vector<>();
+            columnas.add("Facultades");
+
+            registroFacultadTable.setModel(new DefaultTableModel(datos, columnas));
+        } catch (RemoteException ex) {
+            Logger.getLogger(FacultadesRegistradas.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -57,6 +91,11 @@ public class FacultadesRegistradas extends javax.swing.JFrame {
         eliminarButton.setContentAreaFilled(false);
         eliminarButton.setRolloverIcon(new javax.swing.ImageIcon(getClass().getResource("/media/Eliminar – 1.png"))); // NOI18N
         eliminarButton.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/media/Eliminar – 1.png"))); // NOI18N
+        eliminarButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                eliminarButtonActionPerformed(evt);
+            }
+        });
         getContentPane().add(eliminarButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(1220, 450, 100, 100));
 
         agregarButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/media/Agregar.png"))); // NOI18N
@@ -150,12 +189,56 @@ public class FacultadesRegistradas extends javax.swing.JFrame {
     private void agregarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_agregarButtonActionPerformed
         this.setVisible(false);
         agregar.setVisible(true);
+        refrescarTabla();
     }//GEN-LAST:event_agregarButtonActionPerformed
 
     private void editarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editarButtonActionPerformed
-        this.setVisible(false);
-        editar.setVisible(true);
+        try {
+            int filaSeleccionada = registroFacultadTable.getSelectedRow();
+            if (filaSeleccionada == -1) {
+                return;
+            }
+            String nombre = (String) registroFacultadTable.getValueAt(filaSeleccionada, 0);
+            IFacultad facultad = RMI.getIFacultadController().findOne(nombre);
+
+            if (facultad.getId() == 0) {
+                JOptionPane.showMessageDialog(this, "Facultad no encontrada.\n" + "Probablemente la facultad fue eliminada previamente.", "Facultad no encontrada", JOptionPane.ERROR_MESSAGE);
+                refrescarTabla();
+                return;
+            }
+            EditarFacultad editarFacultad = new EditarFacultad(facultad);
+            this.setVisible(false);
+            editarFacultad.setVisible(true);
+            refrescarTabla();
+        } catch (RemoteException ex) {
+            Logger.getLogger(FacultadesRegistradas.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_editarButtonActionPerformed
+
+    private void eliminarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_eliminarButtonActionPerformed
+        try {
+            int filaSeleccionada = registroFacultadTable.getSelectedRow();
+            if (filaSeleccionada == -1) {
+                return;
+            }
+            int confirmacion = JOptionPane.showConfirmDialog(this, "Usted está a punto de eliminar una facultad.\n" + "¿Desea continuar?", "Eliminar Facultad", JOptionPane.YES_NO_OPTION);
+            if (confirmacion != JOptionPane.YES_OPTION) {
+                return;
+            }
+            String nombre = (String) registroFacultadTable.getValueAt(filaSeleccionada, 0);
+            int respuesta = RMI.getIFacultadController().delete(nombre);
+
+            if (respuesta == IFacultadController.DELETE_EXITO) {
+                JOptionPane.showMessageDialog(this, "Facultad eliminada con éxito.", "Operación exitosa", JOptionPane.INFORMATION_MESSAGE);
+                refrescarTabla();
+            } else if (respuesta == IFacultadController.DELETE_ID_INEXISTE) {
+                JOptionPane.showMessageDialog(this, "Facultad incompleta.\n" + "No fue posible eliminar la facultad.", "Facultad incompleto", JOptionPane.ERROR_MESSAGE);
+            }
+
+        } catch (RemoteException ex) {
+            Logger.getLogger(FacultadesRegistradas.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_eliminarButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -182,6 +265,8 @@ public class FacultadesRegistradas extends javax.swing.JFrame {
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(FacultadesRegistradas.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        //</editor-fold>
         //</editor-fold>
         //</editor-fold>
 

@@ -1,11 +1,14 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package gui;
 
+import Iniciador.RMI;
+import Interfaces.IFacultad;
+import Interfaces.IFacultadController;
+import java.rmi.RemoteException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -13,11 +16,11 @@ import javax.swing.ImageIcon;
  */
 public class AgregarFacultad extends javax.swing.JFrame {
 
-    /**
-     * Creates new form AgregarCarrera
-     */
+    private JDialog dialogParent;
+    
     public AgregarFacultad() {
         initComponents();
+        this.dialogParent = dialogParent;
         setIconImage(new ImageIcon(getClass().getResource("/media/logo.png")).getImage());
         this.setLocationRelativeTo(null);
     }
@@ -44,17 +47,32 @@ public class AgregarFacultad extends javax.swing.JFrame {
         cancelarButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/media/cancelar.png"))); // NOI18N
         cancelarButton.setBorder(null);
         cancelarButton.setContentAreaFilled(false);
+        cancelarButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cancelarButtonActionPerformed(evt);
+            }
+        });
         getContentPane().add(cancelarButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 510, 200, 50));
 
         aceptarButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/media/aceptar.png"))); // NOI18N
         aceptarButton.setBorder(null);
         aceptarButton.setContentAreaFilled(false);
+        aceptarButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                aceptarButtonActionPerformed(evt);
+            }
+        });
         getContentPane().add(aceptarButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 510, 200, 50));
 
         facultadTextField.setBackground(new java.awt.Color(220, 236, 246));
         facultadTextField.setFont(new java.awt.Font("Tw Cen MT", 0, 24)); // NOI18N
         facultadTextField.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(220, 236, 246), 3, true));
         facultadTextField.setPreferredSize(new java.awt.Dimension(428, 31));
+        facultadTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                facultadTextFieldActionPerformed(evt);
+            }
+        });
         getContentPane().add(facultadTextField, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 290, 800, 90));
 
         atrasButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/media/atras.png"))); // NOI18N
@@ -79,9 +97,46 @@ public class AgregarFacultad extends javax.swing.JFrame {
         facultades.setVisible(true);
     }//GEN-LAST:event_atrasButtonActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
+    private void aceptarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aceptarButtonActionPerformed
+        try {
+            String nombre = facultadTextField.getText();
+            
+            IFacultad facultad = RMI.getIFacultadController().newInstance();
+
+            if ( nombre.length() == 0 ){
+                JOptionPane.showMessageDialog(this, "Ingrese el nombre de la facultad.", "Validación", JOptionPane.ERROR_MESSAGE );
+                facultadTextField.requestFocus();
+                return;
+            }
+            else{
+                facultad.setFacultad(nombre);
+            }
+            int respuesta = RMI.getIFacultadController().add(facultad);
+            if ( respuesta == IFacultadController.ADD_EXITO ){
+                JOptionPane.showMessageDialog(this, "Facultad agregada con éxito.", "Operación exitosa", JOptionPane.INFORMATION_MESSAGE);
+               // dialogParent.dispose();
+            }
+            else if ( respuesta == IFacultadController.ADD_SIN_EXITO){
+                JOptionPane.showMessageDialog(this, "No fue posible completar la operación.", "Operación incompleta", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (RemoteException ex) {
+            Logger.getLogger(AgregarFacultad.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        FacultadesRegistradas facultades = new FacultadesRegistradas();
+        this.setVisible(false);
+        facultades.setVisible(true);
+    }//GEN-LAST:event_aceptarButtonActionPerformed
+
+    private void facultadTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_facultadTextFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_facultadTextFieldActionPerformed
+
+    private void cancelarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelarButtonActionPerformed
+        FacultadesRegistradas facultades = new FacultadesRegistradas();
+        this.setVisible(false);
+        facultades.setVisible(true);
+    }//GEN-LAST:event_cancelarButtonActionPerformed
+
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -106,12 +161,18 @@ public class AgregarFacultad extends javax.swing.JFrame {
         }
         //</editor-fold>
         //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new AgregarFacultad().setVisible(true);
             }
+            
+            public void windowClosing(java.awt.event.WindowEvent e) {
+                        System.exit(0);
+                    }
         });
     }
 

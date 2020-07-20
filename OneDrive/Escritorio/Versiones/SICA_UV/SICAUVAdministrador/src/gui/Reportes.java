@@ -5,9 +5,22 @@
  */
 package gui;
 
+import Iniciador.RMI;
+import Interfaces.ICarrera;
+import Interfaces.IEstudiante;
+import Interfaces.IFacultad;
+import Interfaces.ITramite;
 import java.awt.Color;
 import java.awt.Font;
+import java.rmi.RemoteException;
+import java.util.List;
+import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -15,18 +28,82 @@ import javax.swing.ImageIcon;
  */
 public class Reportes extends javax.swing.JFrame {
 
+    private static JLabel label;
+    private static JCheckBox checkBox;
+
     /**
      * Creates new form SecretariasRegistradas
      */
     public Reportes() {
         initComponents();
+        refrescarTabla();
         setIconImage(new ImageIcon(getClass().getResource("/media/logo.png")).getImage());
         this.setLocationRelativeTo(null);
         reporteTable.getTableHeader().setFont(new Font("Montserrat", Font.BOLD, 12));
         reporteTable.getTableHeader().setOpaque(false);
         reporteTable.getTableHeader().setOpaque(false);
-        reporteTable.getTableHeader().setForeground(new Color(47,72,90));
+        reporteTable.getTableHeader().setForeground(new Color(47, 72, 90));
         reporteTable.setRowHeight(25);//scroll
+    }
+
+    public void refrescarTabla() {
+        
+        try {
+            Vector<Vector> datos = new Vector<>();
+
+            List<ITramite> listaTramite;
+            listaTramite = RMI.getITramiteController().list();
+            List<IEstudiante> listaEstudiante;
+            listaEstudiante = RMI.getIEstudianteController().list();
+            List<IFacultad> listaFacultad;
+            listaFacultad = RMI.getIFacultadController().list();
+            List<ICarrera> listaCarrera;
+            listaCarrera = RMI.getICarreraController().list();
+
+            for (ITramite tramite : listaTramite) {
+                Vector registro = new Vector();
+                registro.add(tramite.getFolio());
+                registro.add(tramite.getMatricula());
+                for (IEstudiante estudiante : listaEstudiante) {
+                    if (tramite.getMatricula().equals(estudiante.getMatricula())) {
+                        registro.add(estudiante.getNombres() + " " + estudiante.getApellidoPaterno() + " " + estudiante.getApellidoMaterno());
+                        for (IFacultad facultad : listaFacultad) {
+                            if (estudiante.getIdFacultad() == facultad.getId()) {
+                                registro.add(facultad.getFacultad());
+                            }
+                        }
+                        for (ICarrera carrera : listaCarrera) {
+                            if (estudiante.getIdCarrera() == carrera.getIdCarrera()) {
+                                registro.add(carrera.getNombreCarrera());
+                            }
+                        }
+                    }
+                }
+                registro.add(label = new JLabel());
+                registro.add(label = new JLabel());
+                registro.add(checkBox = new JCheckBox());
+                registro.add(checkBox = new JCheckBox());
+                registro.add(checkBox = new JCheckBox());
+
+                datos.add(registro);
+            }
+
+            Vector<String> columnas = new Vector<>();
+            columnas.add("Folio");
+            columnas.add("Matrícula");
+            columnas.add("Nombre");
+            columnas.add("Facultad");
+            columnas.add("Programa educativo");
+            columnas.add("Foto");
+            columnas.add("Firma");
+            columnas.add("Aceptar datos");
+            columnas.add("Rechazar foto");
+            columnas.add("Rechazar firma");
+            reporteTable.setModel(new DefaultTableModel(datos, columnas));
+        } catch (RemoteException ex) {
+            Logger.getLogger(Reportes.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
     }
 
     /**
