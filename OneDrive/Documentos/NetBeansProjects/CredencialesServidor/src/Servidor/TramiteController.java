@@ -25,7 +25,7 @@ public class TramiteController extends UnicastRemoteObject implements ITramiteCo
     public int add(ITramite tramite) throws RemoteException {
         ITramite tramiteEncontrado = findOne(tramite.getFolio());
 
-        boolean existe = (tramiteEncontrado.getFolio() != 0);
+        boolean existe = (tramiteEncontrado.getFolio() != null);
 
         if (existe) {
             return ADD_FOLIO_DUPLICADO;
@@ -39,12 +39,12 @@ public class TramiteController extends UnicastRemoteObject implements ITramiteCo
     }
 
     public int update(ITramite tramite) throws RemoteException {
-        if (tramite.getFolio() == 0) {
+        if (tramite.getFolio() == null) {
             return UPDATE_FOLIO_NULO;
         }
 
         ITramite tramiteEncontrado = findOne(tramite.getFolio());
-        if (tramiteEncontrado.getFolio() == 0) {
+        if (tramiteEncontrado.getFolio() == null) {
             return UPDATE_FOLIO_INEXISTE;
         }
 
@@ -58,7 +58,7 @@ public class TramiteController extends UnicastRemoteObject implements ITramiteCo
 
     public int delete(ITramite tramite) throws RemoteException {
         ITramite tramiteTemp = findOne(tramite.getFolio());
-        if (tramiteTemp.getFolio() == 0) {
+        if (tramiteTemp.getFolio() == null) {
             return DELETE_FOLIO_INEXISTE;
         }
         Map<String, Object> where = new HashMap<>();
@@ -72,25 +72,9 @@ public class TramiteController extends UnicastRemoteObject implements ITramiteCo
         }
     }
 
-    public int delete(String matricula) throws RemoteException {
-        ITramite proveedorTemp = findOne(matricula);
-        if (proveedorTemp.getFolio() == 0) {
-            return DELETE_FOLIO_INEXISTE;
-        }
-        Map<String, Object> where = new HashMap<>();
-        where.put("Matricula", matricula);
-
-        int respuesta = dbManager.eliminar(TABLE, where);
-        if (respuesta == 0) {
-            return DELETE_SIN_EXITO;
-        } else {
-            return DELETE_EXITO;
-        }
-    }
-
-    public int delete(int folio) throws RemoteException {
-        ITramite tramiteTemp = findOne(folio);
-        if (tramiteTemp.getFolio() == 0) {
+    public int delete(String folio) throws RemoteException {
+        ITramite proveedorTemp = findOne(folio);
+        if (proveedorTemp.getFolio() == null) {
             return DELETE_FOLIO_INEXISTE;
         }
         Map<String, Object> where = new HashMap<>();
@@ -119,17 +103,9 @@ public class TramiteController extends UnicastRemoteObject implements ITramiteCo
         return listaITramite;
     }
 
-    public ITramite findOne(int folio) throws RemoteException {
+    public ITramite findOne(String folio) throws RemoteException {
         Map<String, Object> where = new HashMap<>();
         where.put("Folio", folio);
-        Map<String, Object> registro = dbManager.buscarUno(TABLE, where);
-
-        return Tramite.fromMap(registro);
-    }
-
-    public ITramite findOne(String matricula) throws RemoteException {
-        Map<String, Object> where = new HashMap<>();
-        where.put("Matricula", matricula);
         Map<String, Object> registro = dbManager.buscarUno(TABLE, where);
 
         return Tramite.fromMap(registro);
