@@ -86,7 +86,6 @@ public class AgregarSecretaria extends javax.swing.JFrame {
 
         facultadComboBox.setBackground(new java.awt.Color(220, 236, 246));
         facultadComboBox.setFont(new java.awt.Font("Tw Cen MT", 0, 28)); // NOI18N
-        facultadComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Facultad de Contaduria y Administración", "Facultad de Ingeniería" }));
         facultadComboBox.setBorder(null);
         facultadComboBox.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         facultadComboBox.addActionListener(new java.awt.event.ActionListener() {

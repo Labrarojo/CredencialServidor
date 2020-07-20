@@ -25,15 +25,13 @@ import javax.swing.table.DefaultTableModel;
  */
 public class FacultadesRegistradas extends javax.swing.JFrame {
 
-    private static String IDFACULTAD = "Id Facultad";
-    private static String NOMBRE = "Facultad";
     
     public FacultadesRegistradas() {
         initComponents();
         refrescarTabla();
         setIconImage(new ImageIcon(getClass().getResource("/media/logo.png")).getImage());
         this.setLocationRelativeTo(null);
-        registroFacultadTable.getTableHeader().setFont(new Font("Montserrat", Font.BOLD, 12));
+        registroFacultadTable.getTableHeader().setFont(new Font("Montserrat", Font.BOLD, 14));
         registroFacultadTable.getTableHeader().setOpaque(false);
         registroFacultadTable.getTableHeader().setOpaque(false);
         registroFacultadTable.getTableHeader().setForeground(new Color(47,72,90));

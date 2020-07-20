@@ -5,7 +5,16 @@
  */
 package gui;
 
+import Iniciador.RMI;
+import Interfaces.ICarrera;
+import Interfaces.ICarreraController;
+import Interfaces.IFacultad;
+import java.rmi.RemoteException;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -13,13 +22,20 @@ import javax.swing.ImageIcon;
  */
 public class AgregarCarrera extends javax.swing.JFrame {
 
-    /**
-     * Creates new form AgregarCarrera
-     */
+    private List<IFacultad> listaFacultades;
+
     public AgregarCarrera() {
         initComponents();
         setIconImage(new ImageIcon(getClass().getResource("/media/logo.png")).getImage());
         this.setLocationRelativeTo(null);
+        try {
+            listaFacultades = RMI.getIFacultadController().list();
+            for (IFacultad nombreFacultades : listaFacultades) {
+                facultadComboBox.addItem(nombreFacultades.getFacultad());
+            }
+        } catch (RemoteException ex) {
+            Logger.getLogger(AgregarCarrera.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -45,18 +61,31 @@ public class AgregarCarrera extends javax.swing.JFrame {
         cancelarButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/media/cancelar.png"))); // NOI18N
         cancelarButton.setBorder(null);
         cancelarButton.setContentAreaFilled(false);
+        cancelarButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cancelarButtonActionPerformed(evt);
+            }
+        });
         getContentPane().add(cancelarButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 510, 200, 50));
 
         aceptarButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/media/aceptar.png"))); // NOI18N
         aceptarButton.setBorder(null);
         aceptarButton.setContentAreaFilled(false);
+        aceptarButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                aceptarButtonActionPerformed(evt);
+            }
+        });
         getContentPane().add(aceptarButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 510, 200, 50));
 
         facultadComboBox.setBackground(new java.awt.Color(220, 236, 246));
         facultadComboBox.setFont(new java.awt.Font("Tw Cen MT", 0, 28)); // NOI18N
-        facultadComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Facultad de Contaduria y Administración", "Facultad de Ingeniería" }));
-        facultadComboBox.setBorder(null);
         facultadComboBox.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        facultadComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                facultadComboBoxActionPerformed(evt);
+            }
+        });
         getContentPane().add(facultadComboBox, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 210, 800, 90));
 
         carreraTextField.setBackground(new java.awt.Color(220, 236, 246));
@@ -87,6 +116,61 @@ public class AgregarCarrera extends javax.swing.JFrame {
         carreras.setVisible(true);
     }//GEN-LAST:event_atrasButtonActionPerformed
 
+    private void aceptarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aceptarButtonActionPerformed
+        try {
+            String facultad = (String) facultadComboBox.getSelectedItem();
+            String nombre = carreraTextField.getText();
+
+            ICarrera carrera = RMI.getICarreraController().newInstance();
+
+            if (nombre.length() == 0) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Nombre de la carrera",
+                        "Validación",
+                        JOptionPane.ERROR_MESSAGE);
+                carreraTextField.requestFocus();
+                return;
+            } else {
+                carrera.setNombreCarrera(nombre);
+                for (IFacultad facultades : listaFacultades) {
+                    if (facultades.getFacultad().equals(facultad)) {
+                        carrera.setIdFacultad(facultades.getId());
+                    }
+                }
+            }
+            int respuesta = RMI.getICarreraController().add(carrera);
+            if (respuesta == ICarreraController.ADD_EXITO) {
+                JOptionPane.showMessageDialog(this,
+                        "Carrera agregada con éxito",
+                        "Operación éxitosa",
+                        JOptionPane.INFORMATION_MESSAGE);
+                CarrerasRegistradas carreras = new CarrerasRegistradas();
+                this.setVisible(false);
+                carreras.setVisible(true);
+            } else if (respuesta == ICarreraController.ADD_SIN_EXITO) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "No fue posible completar el registro",
+                        "Registro no completado",
+                        JOptionPane.ERROR_MESSAGE);
+
+            }
+        } catch (RemoteException ex) {
+            Logger.getLogger(AgregarCarrera.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_aceptarButtonActionPerformed
+
+    private void facultadComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_facultadComboBoxActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_facultadComboBoxActionPerformed
+
+    private void cancelarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelarButtonActionPerformed
+        this.setVisible(false);
+        CarrerasRegistradas carrerasRegistradas = new CarrerasRegistradas();
+        carrerasRegistradas.setVisible(true);
+    }//GEN-LAST:event_cancelarButtonActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -112,6 +196,7 @@ public class AgregarCarrera extends javax.swing.JFrame {
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(AgregarCarrera.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */

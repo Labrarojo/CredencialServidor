@@ -5,9 +5,20 @@
  */
 package gui;
 
+import Iniciador.RMI;
+import Interfaces.ICarrera;
+import Interfaces.ICarreraController;
+import Interfaces.IFacultad;
 import java.awt.Color;
 import java.awt.Font;
+import java.rmi.RemoteException;
+import java.util.List;
+import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -15,22 +26,48 @@ import javax.swing.ImageIcon;
  */
 public class CarrerasRegistradas extends javax.swing.JFrame {
 
-    /**
-     * Creates new form SecretariasRegistradas
-     */
     public CarrerasRegistradas() {
         initComponents();
+        refrescarTabla();
         setIconImage(new ImageIcon(getClass().getResource("/media/logo.png")).getImage());
         this.setLocationRelativeTo(null);
-        registroCarreraTable.getTableHeader().setFont(new Font("Montserrat", Font.BOLD, 12));
+        registroCarreraTable.getTableHeader().setFont(new Font("Montserrat", Font.BOLD, 14));
         registroCarreraTable.getTableHeader().setOpaque(false);
         registroCarreraTable.getTableHeader().setOpaque(false);
-        registroCarreraTable.getTableHeader().setForeground(new Color(47,72,90));
+        registroCarreraTable.getTableHeader().setForeground(new Color(47, 72, 90));
         registroCarreraTable.setRowHeight(25);//scroll
     }
-    
+
     AgregarCarrera agregar = new AgregarCarrera();
-    EditarCarrera editar = new EditarCarrera();
+
+    public void refrescarTabla() {
+        try {
+            Vector<Vector> datos = new Vector<>();
+
+            List<ICarrera> listaCarrera;
+            listaCarrera = RMI.getICarreraController().list();
+            List<IFacultad> listaFacultad;
+            listaFacultad = RMI.getIFacultadController().list();
+
+            for (ICarrera iCarrera : listaCarrera) {
+                Vector registro = new Vector();
+                for (IFacultad iFacultad : listaFacultad) {
+                    if (iCarrera.getIdFacultad() == iFacultad.getId()) {
+                        registro.add(iFacultad.getFacultad());
+                    }
+                }
+                registro.add(iCarrera.getNombreCarrera());
+                datos.add(registro);
+            }
+            Vector<String> columnas = new Vector<>();
+            columnas.add("Facultad");
+            columnas.add("Carrera");
+            registroCarreraTable.setModel(new DefaultTableModel(datos, columnas));
+        } catch (RemoteException ex) {
+            Logger.getLogger(CarrerasRegistradas.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -58,6 +95,11 @@ public class CarrerasRegistradas extends javax.swing.JFrame {
         eliminarButton.setContentAreaFilled(false);
         eliminarButton.setRolloverIcon(new javax.swing.ImageIcon(getClass().getResource("/media/Eliminar – 1.png"))); // NOI18N
         eliminarButton.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/media/Eliminar – 1.png"))); // NOI18N
+        eliminarButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                eliminarButtonActionPerformed(evt);
+            }
+        });
         getContentPane().add(eliminarButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(1220, 450, 100, 100));
 
         agregarButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/media/Agregar.png"))); // NOI18N
@@ -151,12 +193,80 @@ public class CarrerasRegistradas extends javax.swing.JFrame {
     private void agregarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_agregarButtonActionPerformed
         this.setVisible(false);
         agregar.setVisible(true);
+        refrescarTabla();
     }//GEN-LAST:event_agregarButtonActionPerformed
 
     private void editarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editarButtonActionPerformed
-        this.setVisible(false);
-        editar.setVisible(true);
+        try {
+            int filaSeleccionada = registroCarreraTable.getSelectedRow();
+            if (filaSeleccionada == -1) {
+                return;
+            }
+            String nombreCarrera = (String) registroCarreraTable.getValueAt(filaSeleccionada, 1);
+            ICarrera carrera = RMI.getICarreraController().findOne(nombreCarrera);
+            if (carrera.getIdCarrera() == 0) {
+                JOptionPane.showMessageDialog(this,
+                        "Carrera no encontrada.\n"
+                        + "Es probable que la carrera haya sido eliminada previamente",
+                        "Carrera no encontrada",
+                        JOptionPane.ERROR_MESSAGE);
+                refrescarTabla();
+                return;
+            }
+
+            EditarCarrera editarCarrera = new EditarCarrera(carrera);
+            this.setVisible(false);
+            editarCarrera.setVisible(true);
+            refrescarTabla();
+        } catch (RemoteException ex) {
+            Logger.getLogger(CarrerasRegistradas.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_editarButtonActionPerformed
+
+    private void eliminarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_eliminarButtonActionPerformed
+        try {
+            int filaSeleccionada = registroCarreraTable.getSelectedRow();
+            if (filaSeleccionada == -1) {
+                return;
+            }
+            int confirmacion = JOptionPane.showConfirmDialog(this,
+                    "Usted está a punto de eliminar una carrera\n"
+                    + "¿Desea continuar?",
+                    "¿ELiminar carrera?",
+                    JOptionPane.YES_NO_OPTION);
+            if (confirmacion != JOptionPane.YES_OPTION) {
+                return;
+            }
+
+            String Carrera = (String) registroCarreraTable.getValueAt(filaSeleccionada, 1);
+            int respuesta = RMI.getICarreraController().delete(Carrera);
+
+            if (respuesta == ICarreraController.DELETE_EXITO) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Carrera eliminada con éxito.",
+                        "Operación éxitosa",
+                        JOptionPane.INFORMATION_MESSAGE);
+                refrescarTabla();
+            } else if (respuesta == ICarreraController.DELETE_ID_INEXISTENTE) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Carrera no encontrada.\n"
+                        + "Es posible que la carrera haya sido eliminada previamente",
+                        "Carrera no encontrada",
+                        JOptionPane.ERROR_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Operación incompleta.\nNo fue posible eliminar la carrera",
+                        "Operación incompleta",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+
+        } catch (RemoteException ex) {
+            Logger.getLogger(CarrerasRegistradas.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_eliminarButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -183,10 +293,8 @@ public class CarrerasRegistradas extends javax.swing.JFrame {
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(CarrerasRegistradas.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
+
+
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {

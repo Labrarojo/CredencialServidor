@@ -12,23 +12,36 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class EditarSecretaria extends javax.swing.JFrame {
+
     private ISecretario secretaria;
-    
+
     private List<IFacultad> listaFacultad;
-    public EditarSecretaria() {
+
+    public EditarSecretaria(ISecretario secretaria) {
         initComponents();
+        this.secretaria = secretaria;
         setIconImage(new ImageIcon(getClass().getResource("/media/logo.png")).getImage());
         this.setLocationRelativeTo(null);
-        
+
         try {
             listaFacultad = RMI.getIFacultadController().list();
             for (IFacultad nombreFacultad : listaFacultad) {
                 facultadComboBox.addItem(nombreFacultad.getFacultad());
             }
+            nombreTextField.setText(secretaria.getNombres());
+            paternoTextField.setText(secretaria.getApellidoPaterno());
+            maternoTextField.setText(secretaria.getApellidoMaterno());
+            for (IFacultad iFacultad : listaFacultad) {
+                if (iFacultad.getId() == secretaria.getIdFacultad()) {
+                    facultadComboBox.setSelectedItem(iFacultad.getFacultad());
+                }
+            }
+            matriculaTextField.setText(secretaria.getMatriculaSecretario());
+            contraseñaPasswordField.setText(secretaria.getContraseña());
         } catch (RemoteException ex) {
             Logger.getLogger(AgregarSecretaria.class.getName()).log(Level.SEVERE, null, ex);
-        } 
-        
+        }
+
     }
 
     /**
@@ -84,9 +97,13 @@ public class EditarSecretaria extends javax.swing.JFrame {
 
         facultadComboBox.setBackground(new java.awt.Color(220, 236, 246));
         facultadComboBox.setFont(new java.awt.Font("Tw Cen MT", 0, 28)); // NOI18N
-        facultadComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Facultad de Contaduria y Administración", "Facultad de Ingeniería" }));
         facultadComboBox.setBorder(null);
         facultadComboBox.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        facultadComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                facultadComboBoxActionPerformed(evt);
+            }
+        });
         getContentPane().add(facultadComboBox, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 410, 950, 60));
 
         paternoTextField.setBackground(new java.awt.Color(220, 236, 246));
@@ -149,8 +166,8 @@ public class EditarSecretaria extends javax.swing.JFrame {
 
     private void jToggleButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton1ActionPerformed
         if (jToggleButton1.isSelected()) {
-            contraseñaPasswordField.setEchoChar((char)0);
-        }else{
+            contraseñaPasswordField.setEchoChar((char) 0);
+        } else {
             contraseñaPasswordField.setEchoChar('*');
         }
     }//GEN-LAST:event_jToggleButton1ActionPerformed
@@ -169,45 +186,45 @@ public class EditarSecretaria extends javax.swing.JFrame {
             String nombreFacultad = (String) facultadComboBox.getSelectedItem();
             String matricula = matriculaTextField.getText();
             String contraseña = contraseñaPasswordField.getText();
-            
+
             ISecretario secretaria = RMI.getISecretarioController().newInstance();
-            
-            if(nombre.length() == 0){
+
+            if (nombre.length() == 0) {
                 JOptionPane.showMessageDialog(
                         this,
-                        "Ingrese nombre.", 
-                        "Validación", 
+                        "Ingrese nombre.",
+                        "Validación",
                         JOptionPane.ERROR_MESSAGE);
                 nombreTextField.requestFocus();
                 return;
-            }else{
+            } else {
                 secretaria.setNombres(nombre);
             }
-            
-            if(apellidoPaterno.length() == 0){
+
+            if (apellidoPaterno.length() == 0) {
                 JOptionPane.showMessageDialog(
                         this,
-                        "Ingrese el apellido paterno.", 
-                        "Validación", 
+                        "Ingrese el apellido paterno.",
+                        "Validación",
                         JOptionPane.ERROR_MESSAGE);
                 paternoTextField.requestFocus();
                 return;
-            }else{
+            } else {
                 secretaria.setApellidoPaterno(apellidoPaterno);
             }
-            
-            if(apellidoMaterno.length() == 0){
+
+            if (apellidoMaterno.length() == 0) {
                 JOptionPane.showMessageDialog(
                         this,
-                        "Ingrese el apellido materno.", 
-                        "Validación", 
+                        "Ingrese el apellido materno.",
+                        "Validación",
                         JOptionPane.ERROR_MESSAGE);
                 maternoTextField.requestFocus();
                 return;
-            }else{
+            } else {
                 secretaria.setApellidoMaterno(apellidoMaterno);
             }
-            
+
             if (nombreFacultad.length() == 0) {
                 JOptionPane.showMessageDialog(
                         this,
@@ -219,33 +236,33 @@ public class EditarSecretaria extends javax.swing.JFrame {
             } else {
                 for (IFacultad iFacultad : listaFacultad) {
                     if (iFacultad.getFacultad().equals(nombreFacultad)) {
-                        
+
                         secretaria.setIdFacultad(iFacultad.getId());
                     }
                 }
             }
-            
-            if(matricula.length() == 0){
+
+            if (matricula.length() == 0) {
                 JOptionPane.showMessageDialog(
                         this,
-                        "Ingrese la matrícula.", 
-                        "Validación", 
+                        "Ingrese la matrícula.",
+                        "Validación",
                         JOptionPane.ERROR_MESSAGE);
                 matriculaTextField.requestFocus();
                 return;
-            }else{
+            } else {
                 secretaria.setMatriculaSecretario(matricula);
             }
-            
-            if(contraseña.length() == 0){
+
+            if (contraseña.length() == 0) {
                 JOptionPane.showMessageDialog(
                         this,
-                        "Ingrese una contraseña.", 
-                        "Validación", 
+                        "Ingrese una contraseña.",
+                        "Validación",
                         JOptionPane.ERROR_MESSAGE);
                 contraseñaPasswordField.requestFocus();
                 return;
-            }else{
+            } else {
                 secretaria.setContraseña(contraseña);
             }
 
@@ -260,24 +277,24 @@ public class EditarSecretaria extends javax.swing.JFrame {
                 this.setVisible(false);
                 secretarias.setVisible(true);
             } else if (respuesta == ISecretarioController.UPDATE_SIN_EXITO) {
-                JOptionPane.showMessageDialog(this, "No fue posible completar la operación.", 
-                        "Operación incompleta", 
+                JOptionPane.showMessageDialog(this, "No fue posible completar la operación.",
+                        "Operación incompleta",
                         JOptionPane.ERROR_MESSAGE);
-                
+
             } else if (respuesta == ISecretarioController.UPDATE_MATRICULA_INEXISTE) {
                 JOptionPane.showMessageDialog(
-                        this, 
+                        this,
                         "No fue posible completar la operación.\n" + "La matrícula ingresada no se encuentra registrada.\n",
-                        "Operación incompleta", 
+                        "Operación incompleta",
                         JOptionPane.ERROR_MESSAGE);
             } //else if (respuesta == ISecretarioController.UPDATE_MATRICULA_NULA){
-                //JOptionPane.showMessageDialog(this, evt, matricula, WIDTH);
+            //JOptionPane.showMessageDialog(this, evt, matricula, WIDTH);
             //}
 
         } catch (RemoteException ex) {
             Logger.getLogger(EditarSecretaria.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
     }//GEN-LAST:event_guardarButtonActionPerformed
 
     private void cancelarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelarButtonActionPerformed
@@ -285,6 +302,10 @@ public class EditarSecretaria extends javax.swing.JFrame {
         this.setVisible(false);
         secretarias.setVisible(true);
     }//GEN-LAST:event_cancelarButtonActionPerformed
+
+    private void facultadComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_facultadComboBoxActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_facultadComboBoxActionPerformed
 
     /**
      * @param args the command line arguments
@@ -319,7 +340,6 @@ public class EditarSecretaria extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new EditarSecretaria().setVisible(true);
             }
         });
     }

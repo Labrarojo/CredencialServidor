@@ -5,7 +5,16 @@
  */
 package gui;
 
+import Iniciador.RMI;
+import Interfaces.ICarrera;
+import Interfaces.ICarreraController;
+import Interfaces.IFacultad;
+import java.rmi.RemoteException;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -13,13 +22,33 @@ import javax.swing.ImageIcon;
  */
 public class EditarCarrera extends javax.swing.JFrame {
 
-    /**
-     * Creates new form EditarCarreraa
-     */
-    public EditarCarrera() {
+    private ICarrera carrera;
+
+    private List<ICarrera> listaCarrera;
+    private List<IFacultad> listaFacultad;
+
+    public EditarCarrera(ICarrera carrera) {
+
         initComponents();
+        this.carrera = carrera;
         setIconImage(new ImageIcon(getClass().getResource("/media/logo.png")).getImage());
         this.setLocationRelativeTo(null);
+
+        try {
+            listaFacultad = RMI.getIFacultadController().list();
+            for (IFacultad nombreFacultad : listaFacultad) {
+                facultadComboBox.addItem(nombreFacultad.getFacultad());
+            }
+
+            carreraTextField.setText(carrera.getNombreCarrera());
+            for (IFacultad iFacultad : listaFacultad) {
+                if (iFacultad.getId() == carrera.getIdFacultad()) {
+                    facultadComboBox.setSelectedItem(iFacultad.getFacultad());
+                }
+            }
+        } catch (RemoteException ex) {
+            Logger.getLogger(EditarCarrera.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -45,17 +74,26 @@ public class EditarCarrera extends javax.swing.JFrame {
         cancelarButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/media/cancelar.png"))); // NOI18N
         cancelarButton.setBorder(null);
         cancelarButton.setContentAreaFilled(false);
+        cancelarButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cancelarButtonActionPerformed(evt);
+            }
+        });
         getContentPane().add(cancelarButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 510, 200, 50));
 
         guardarButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/media/Guardar.png"))); // NOI18N
         guardarButton.setBorder(null);
         guardarButton.setContentAreaFilled(false);
+        guardarButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                guardarButtonActionPerformed(evt);
+            }
+        });
         getContentPane().add(guardarButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 510, 200, 50));
 
         facultadComboBox.setBackground(new java.awt.Color(220, 236, 246));
         facultadComboBox.setFont(new java.awt.Font("Tw Cen MT", 0, 28)); // NOI18N
         facultadComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Facultad de Contaduria y Administración", "Facultad de Ingeniería" }));
-        facultadComboBox.setBorder(null);
         facultadComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 facultadComboBoxActionPerformed(evt);
@@ -95,6 +133,56 @@ public class EditarCarrera extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_facultadComboBoxActionPerformed
 
+    private void guardarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guardarButtonActionPerformed
+        try {
+            String nombreCarrera = carreraTextField.getText();
+
+            if (nombreCarrera.length() == 0) {
+                JOptionPane.showMessageDialog(this,
+                        "Ingrese carrera.",
+                        "Validación.",
+                        JOptionPane.ERROR_MESSAGE);
+                carreraTextField.requestFocus();
+                return;
+            } else {
+                carrera.setNombreCarrera(nombreCarrera);
+            }
+
+            int respuesta = RMI.getICarreraController().update(carrera);
+            if (respuesta == ICarreraController.UPDATE_EXITO) {
+                JOptionPane.showMessageDialog(this,
+                        "Carrera modificada con éxito",
+                        "Cambio éxitoso",
+                        JOptionPane.INFORMATION_MESSAGE);
+                this.setVisible(false);
+                CarrerasRegistradas carrerasRegistradas = new CarrerasRegistradas();
+                carrerasRegistradas.setVisible(true);
+            } else if (respuesta == ICarreraController.UPDATE_SIN_EXITO) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "No fue posible completar la operación",
+                        "Operacion no completada",
+                        JOptionPane.ERROR_MESSAGE);
+            } else if (respuesta == ICarreraController.UPDATE_ID_INEXISTE) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "No fue posible completar la operación.\n"
+                        + "Carrera no encontrada.\n"
+                        + "Es probable que la carrera haya sido eliminado con anterioridad.",
+                        "Operacion no completada",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (RemoteException ex) {
+            Logger.getLogger(EditarCarrera.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_guardarButtonActionPerformed
+
+    private void cancelarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelarButtonActionPerformed
+        this.setVisible(false);
+        CarrerasRegistradas carrerasRegistradas = new CarrerasRegistradas();
+        carrerasRegistradas.setVisible(true);
+    }//GEN-LAST:event_cancelarButtonActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -121,11 +209,11 @@ public class EditarCarrera extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(EditarCarrera.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
+        //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new EditarCarrera().setVisible(true);
             }
         });
     }

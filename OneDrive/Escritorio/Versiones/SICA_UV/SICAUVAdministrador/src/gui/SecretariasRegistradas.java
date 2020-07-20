@@ -29,15 +29,15 @@ public class SecretariasRegistradas extends javax.swing.JFrame {
         refrescarTabla();
         setIconImage(new ImageIcon(getClass().getResource("/media/logo.png")).getImage());
         this.setLocationRelativeTo(null);
-        registroSecretariaTable.getTableHeader().setFont(new Font("Montserrat", Font.BOLD, 12));
+        registroSecretariaTable.getTableHeader().setFont(new Font("Montserrat", Font.BOLD, 14));
         registroSecretariaTable.getTableHeader().setOpaque(false);
         registroSecretariaTable.getTableHeader().setOpaque(false);
-        registroSecretariaTable.getTableHeader().setForeground(new Color(47,72,90));
+        registroSecretariaTable.getTableHeader().setForeground(new Color(47, 72, 90));
         registroSecretariaTable.setRowHeight(25);//scroll
     }
 
     AgregarSecretaria agregar = new AgregarSecretaria();
-    EditarSecretaria editar = new EditarSecretaria();
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -152,43 +152,43 @@ public class SecretariasRegistradas extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-    
-    public void refrescarTabla(){
+
+    public void refrescarTabla() {
         try {
-           Vector<Vector> datos = new Vector<>();
-           
-           List<ISecretario> listaSecretarios = RMI.getISecretarioController().list();
-           List<IFacultad> listaFacultades = RMI.getIFacultadController().list();
-           
-           for (ISecretario secretario: listaSecretarios){
-               Vector registro = new Vector();
-               
-               registro.add(secretario.getMatriculaSecretario());
-               registro.add(secretario.getNombres());
-               registro.add(secretario.getApellidoPaterno());
-               registro.add(secretario.getApellidoMaterno());
-               for(IFacultad facultad : listaFacultades){
-                   if(secretario.getIdFacultad() == facultad.getId()){
-                       registro.add(facultad.getFacultad());
-                   }
-               }
-               
-               datos.add(registro);
-           }
-           
-           Vector<String> columnas = new Vector<>();
-           columnas.add("Matrícula");
-           columnas.add("Nombre de la secretaria");
-           columnas.add("Apellido paterno");
-           columnas.add("Apellido materno");
-           columnas.add("Facultad");
-          
-           registroSecretariaTable.setModel(new DefaultTableModel(datos, columnas));
+            Vector<Vector> datos = new Vector<>();
+
+            List<ISecretario> listaSecretarios = RMI.getISecretarioController().list();
+            List<IFacultad> listaFacultades = RMI.getIFacultadController().list();
+
+            for (ISecretario secretario : listaSecretarios) {
+                Vector registro = new Vector();
+
+                registro.add(secretario.getMatriculaSecretario());
+                registro.add(secretario.getNombres());
+                registro.add(secretario.getApellidoPaterno());
+                registro.add(secretario.getApellidoMaterno());
+                for (IFacultad facultad : listaFacultades) {
+                    if (secretario.getIdFacultad() == facultad.getId()) {
+                        registro.add(facultad.getFacultad());
+                    }
+                }
+
+                datos.add(registro);
+            }
+
+            Vector<String> columnas = new Vector<>();
+            columnas.add("Matrícula");
+            columnas.add("Nombre de la secretaria");
+            columnas.add("Apellido paterno");
+            columnas.add("Apellido materno");
+            columnas.add("Facultad");
+
+            registroSecretariaTable.setModel(new DefaultTableModel(datos, columnas));
         } catch (RemoteException ex) {
             Logger.getLogger(SecretariasRegistradas.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     private void homeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_homeButtonActionPerformed
         MenuAdministrador MenuAdmin = new MenuAdministrador();
         this.setVisible(false);
@@ -198,44 +198,62 @@ public class SecretariasRegistradas extends javax.swing.JFrame {
     private void agregarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_agregarButtonActionPerformed
         this.setVisible(false);
         agregar.setVisible(true);
+        refrescarTabla();
     }//GEN-LAST:event_agregarButtonActionPerformed
 
     private void editarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editarButtonActionPerformed
-        this.setVisible(false);
-        editar.setVisible(true);
+        try {
+            int filaSeleccionada = registroSecretariaTable.getSelectedRow();
+            if (filaSeleccionada == -1) {
+                return;
+            }
+            String matricula = (String) registroSecretariaTable.getValueAt(filaSeleccionada, 0);
+            ISecretario secretario = RMI.getISecretarioController().findOne(matricula);
+
+            if (secretario.getMatriculaSecretario() == null) {
+                JOptionPane.showMessageDialog(this, "Matrícula no encontrada.\n" + "Probablemente la matrícula fue eliminada previamente.", "Matrícula no encontrada", JOptionPane.ERROR_MESSAGE);
+                refrescarTabla();
+                return;
+            }
+            EditarSecretaria editarSecretaria = new EditarSecretaria(secretario);
+            this.setVisible(false);
+            editarSecretaria.setVisible(true);
+            refrescarTabla();
+        } catch (RemoteException ex) {
+            Logger.getLogger(SecretariasRegistradas.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_editarButtonActionPerformed
 
     private void eliminarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_eliminarButtonActionPerformed
         try {
             int filaSeleccionada = registroSecretariaTable.getSelectedRow();
-            if ( filaSeleccionada == -1){
+            if (filaSeleccionada == -1) {
                 return;
             }
             int confirmacion = JOptionPane.showConfirmDialog(
-                    this, 
+                    this,
                     "Usted está a punto de eliminar una secretaria.\n" + "¿Desea continuar?",
-                    "Eliminar secretaria", 
+                    "Eliminar secretaria",
                     JOptionPane.YES_NO_OPTION);
-            if ( confirmacion != JOptionPane.YES_OPTION ){
-               return; 
+            if (confirmacion != JOptionPane.YES_OPTION) {
+                return;
             }
             String matriculaSecretaria = (String) registroSecretariaTable.getValueAt(filaSeleccionada, 0);
             int respuesta = RMI.getISecretarioController().delete(matriculaSecretaria);
-            
-            if ( respuesta == ISecretarioController.DELETE_EXITO ){
+
+            if (respuesta == ISecretarioController.DELETE_EXITO) {
                 JOptionPane.showMessageDialog(this,
-                        "Secretaria eliminada con éxito.", 
+                        "Secretaria eliminada con éxito.",
                         "Operación exitosa",
                         JOptionPane.INFORMATION_MESSAGE);
                 refrescarTabla();
-            }
-            else if ( respuesta == ISecretarioController.DELETE_SIN_EXITO ){
+            } else if (respuesta == ISecretarioController.DELETE_SIN_EXITO) {
                 JOptionPane.showMessageDialog(this,
                         "No fue posible completar la operación.",
-                        "Operación no exitosa", 
+                        "Operación no exitosa",
                         JOptionPane.ERROR_MESSAGE);
             }
-            
+
         } catch (RemoteException ex) {
             Logger.getLogger(SecretariasRegistradas.class.getName()).log(Level.SEVERE, null, ex);
         }
