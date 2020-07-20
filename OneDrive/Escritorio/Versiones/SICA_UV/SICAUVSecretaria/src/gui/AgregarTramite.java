@@ -5,6 +5,16 @@
  */
 package gui;
 
+import Iniciador.RMI;
+import Interfaces.IEstudiante;
+import Interfaces.ITramite;
+import Interfaces.ITramiteController;
+import java.rmi.RemoteException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import javax.swing.ImageIcon;
 
 /**
@@ -53,9 +63,15 @@ public class AgregarTramite extends javax.swing.JFrame {
         });
         getContentPane().add(atrasButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 60, 50, -1));
 
+        nombreTextField.setEditable(false);
         nombreTextField.setBackground(new java.awt.Color(220, 236, 246));
         nombreTextField.setFont(new java.awt.Font("Tw Cen MT", 0, 24)); // NOI18N
         nombreTextField.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(220, 236, 246), 3, true));
+        nombreTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                nombreTextFieldActionPerformed(evt);
+            }
+        });
         getContentPane().add(nombreTextField, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 360, 800, 90));
 
         matriculaTextField.setBackground(new java.awt.Color(220, 236, 246));
@@ -66,16 +82,31 @@ public class AgregarTramite extends javax.swing.JFrame {
         folioTextField.setBackground(new java.awt.Color(220, 236, 246));
         folioTextField.setFont(new java.awt.Font("Tw Cen MT", 0, 24)); // NOI18N
         folioTextField.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(220, 236, 246), 3, true));
+        folioTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                folioTextFieldActionPerformed(evt);
+            }
+        });
         getContentPane().add(folioTextField, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 210, 370, 90));
 
         aceptarButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/media/aceptar.png"))); // NOI18N
         aceptarButton.setBorder(null);
         aceptarButton.setContentAreaFilled(false);
+        aceptarButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                aceptarButtonActionPerformed(evt);
+            }
+        });
         getContentPane().add(aceptarButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 510, 200, 50));
 
         cancelarButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/media/cancelar.png"))); // NOI18N
         cancelarButton.setBorder(null);
         cancelarButton.setContentAreaFilled(false);
+        cancelarButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cancelarButtonActionPerformed(evt);
+            }
+        });
         getContentPane().add(cancelarButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 510, 200, 50));
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/media/Agregar trámite – 1.png"))); // NOI18N
@@ -89,6 +120,106 @@ public class AgregarTramite extends javax.swing.JFrame {
         this.setVisible(false);
         tramite.setVisible(true);
     }//GEN-LAST:event_atrasButtonActionPerformed
+
+    private void aceptarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aceptarButtonActionPerformed
+        try {
+            String folio = folioTextField.getText();
+            String matricula = matriculaTextField.getText();
+            
+            ITramite tramite = RMI.getITramiteController().newInstance();
+            
+            if( folio.length() == 0){
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Ingrese número de folio.",
+                        "Validación",
+                        JOptionPane.ERROR_MESSAGE);
+                folioTextField.requestFocus();
+                return;
+            }else {
+                tramite.setFolio(folio);
+            }
+            
+            if(matricula.length() == 0){
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Ingrese la matrícula.",
+                        "Validación",
+                        JOptionPane.ERROR_MESSAGE);
+                matriculaTextField.requestFocus();
+                return;
+            }else{
+                tramite.setMatricula(matricula);
+                IEstudiante estudiante = RMI.getIEstudianteController().findOne(matricula);
+                nombreTextField.setText(estudiante.getNombres());
+            }
+           
+            int respuesta = RMI.getITramiteController().add(tramite);
+            
+            if(respuesta == ITramiteController.ADD_EXITO ){
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Tramite agregado con éxito.",
+                        "Operación exitosa",
+                        JOptionPane.INFORMATION_MESSAGE);
+                
+                SimpleDateFormat fechaActual = new SimpleDateFormat("dd-MM-aaaa");
+                String fecha = fechaActual.format(new Date());
+                tramite.setFecha(fecha);
+                tramite.setEstado("Pendiente");
+                /*
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+                String fechaComoCadena = sdf.format(new Date());
+                System.out.println(fechaComoCadena);
+                
+                SimpleDateFormat fechaActual = new SimpleDateFormat(formatoFecha);
+                String formatoFecha = "dd-MM-aaaa";
+                Date fecha = new Date();
+                */
+                Tramite tramites = new Tramite();
+                this.setVisible(false);
+                tramites.setVisible(true);
+      
+            }else if (respuesta == ITramiteController.ADD_FOLIO_DUPLICADO){
+                JOptionPane.showMessageDialog(
+                        this,
+                        "El folio ingresado ya se encuentra registrado.",
+                        "Operación no exitosa",
+                        JOptionPane.ERROR_MESSAGE);
+                
+            }else if (respuesta == ITramiteController.ADD_SIN_EXITO) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "No fue posible realizar el registro.",
+                        "Operación no exitosa",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        
+        } catch (RemoteException ex) {
+            Logger.getLogger(AgregarTramite.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_aceptarButtonActionPerformed
+
+    private void folioTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_folioTextFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_folioTextFieldActionPerformed
+
+    private void cancelarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelarButtonActionPerformed
+        Tramite tramite = new Tramite();
+        this.setVisible(false);
+        tramite.setVisible(true);
+    }//GEN-LAST:event_cancelarButtonActionPerformed
+
+    private void nombreTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nombreTextFieldActionPerformed
+        try {
+            String matricula = matriculaTextField.getText();
+            IEstudiante estudiante = RMI.getIEstudianteController().findOne(matricula);
+            nombreTextField.setText(estudiante.getNombres());
+        } catch (RemoteException ex) {
+            Logger.getLogger(AgregarTramite.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }//GEN-LAST:event_nombreTextFieldActionPerformed
 
     /**
      * @param args the command line arguments
@@ -115,6 +246,7 @@ public class AgregarTramite extends javax.swing.JFrame {
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(AgregarTramite.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */

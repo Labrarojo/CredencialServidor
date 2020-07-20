@@ -1,25 +1,37 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package gui;
 
+import Iniciador.RMI;
+import Interfaces.IEstudiante;
+import Interfaces.ITramite;
+import Interfaces.ITramiteController;
+import java.rmi.RemoteException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 
-/**
- *
- * @author adria
- */
 public class EditarTramite extends javax.swing.JFrame {
 
-    /**
-     * Creates new form EditarTramite
-     */
-    public EditarTramite() {
+    private ITramite tramite;
+
+    public EditarTramite(ITramite tramite) {
         initComponents();
+        this.tramite = tramite;
         setIconImage(new ImageIcon(getClass().getResource("/media/logo.png")).getImage());
         this.setLocationRelativeTo(null);
+
+        try {
+            folioTextField.setText(tramite.getFolio());
+            matriculaTextField.setText(tramite.getMatricula());
+            String matricula = matriculaTextField.getText();
+            IEstudiante estudiante = RMI.getIEstudianteController().findOne(matricula);
+            nombreTextField.setText(estudiante.getNombres() + " " + estudiante.getApellidoPaterno() + " " + estudiante.getApellidoMaterno());
+
+        } catch (RemoteException ex) {
+            Logger.getLogger(EditarTramite.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -53,6 +65,7 @@ public class EditarTramite extends javax.swing.JFrame {
         });
         getContentPane().add(atrasButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 60, 50, -1));
 
+        nombreTextField.setEditable(false);
         nombreTextField.setBackground(new java.awt.Color(220, 236, 246));
         nombreTextField.setFont(new java.awt.Font("Tw Cen MT", 0, 24)); // NOI18N
         nombreTextField.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(220, 236, 246), 3, true));
@@ -71,11 +84,21 @@ public class EditarTramite extends javax.swing.JFrame {
         guardarButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/media/Guardar_1.png"))); // NOI18N
         guardarButton.setBorder(null);
         guardarButton.setContentAreaFilled(false);
+        guardarButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                guardarButtonActionPerformed(evt);
+            }
+        });
         getContentPane().add(guardarButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 510, 200, 50));
 
         cancelarButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/media/cancelar.png"))); // NOI18N
         cancelarButton.setBorder(null);
         cancelarButton.setContentAreaFilled(false);
+        cancelarButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cancelarButtonActionPerformed(evt);
+            }
+        });
         getContentPane().add(cancelarButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 510, 200, 50));
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/media/EditarTram.png"))); // NOI18N
@@ -89,6 +112,74 @@ public class EditarTramite extends javax.swing.JFrame {
         this.setVisible(false);
         tramite.setVisible(true);
     }//GEN-LAST:event_atrasButtonActionPerformed
+
+    private void guardarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guardarButtonActionPerformed
+        try {
+            String matricula = matriculaTextField.getText();
+            String folio = folioTextField.getText();
+
+            if (folio.length() == 0) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Ingrese el folio",
+                        "Validación",
+                        JOptionPane.ERROR_MESSAGE);
+                folioTextField.requestFocus();
+                return;
+            } else {
+                tramite.setFolio(folio);
+            }
+
+            if (matricula.length() == 0) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Ingrese la matrícula.",
+                        "Validación",
+                        JOptionPane.ERROR_MESSAGE);
+                matriculaTextField.requestFocus();
+                return;
+            } else {
+                tramite.setMatricula(matricula);
+                IEstudiante estudiante = RMI.getIEstudianteController().findOne(matricula);
+                nombreTextField.setText(estudiante.getNombres());
+            }
+
+            int respuesta = RMI.getITramiteController().update(tramite);
+            if (respuesta == ITramiteController.UPDATE_EXITO) {
+                JOptionPane.showMessageDialog(this,
+                        "El trámite ha sido modificado exitosamente.",
+                        "Cambios registrados",
+                        JOptionPane.INFORMATION_MESSAGE);
+
+                SimpleDateFormat fechaActual = new SimpleDateFormat("dd-MM-aaaa");
+                String fecha = fechaActual.format(new Date());
+                tramite.setFecha(fecha);
+                tramite.setEstado("Pendiente");
+
+                Tramite tramites = new Tramite();
+                this.setVisible(false);
+                tramites.setVisible(true);
+            } else if (respuesta == ITramiteController.UPDATE_FOLIO_INEXISTE) {
+                JOptionPane.showMessageDialog(this,
+                        "El folio ingresado no se encuentra registrado.",
+                        "Operación no exitosa",
+                        JOptionPane.ERROR_MESSAGE);
+            } else if (respuesta == ITramiteController.UPDATE_SIN_EXITO) {
+                JOptionPane.showMessageDialog(this,
+                        "No fue posible registrar el cambio.",
+                        "Operación no exitosa",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (RemoteException ex) {
+            Logger.getLogger(EditarTramite.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_guardarButtonActionPerformed
+
+    private void cancelarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelarButtonActionPerformed
+        Tramite tramite = new Tramite();
+        this.setVisible(false);
+        tramite.setVisible(true);
+    }//GEN-LAST:event_cancelarButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -116,11 +207,11 @@ public class EditarTramite extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(EditarTramite.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
+        //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new EditarTramite().setVisible(true);
             }
         });
     }

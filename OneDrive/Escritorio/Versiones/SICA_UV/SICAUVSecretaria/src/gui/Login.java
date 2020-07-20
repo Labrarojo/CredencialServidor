@@ -5,7 +5,13 @@
  */
 package gui;
 
+import Iniciador.RMI;
+import Interfaces.ISecretario;
+import java.rmi.RemoteException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -14,8 +20,7 @@ import javax.swing.ImageIcon;
 public class Login extends javax.swing.JFrame {
 
     MenuSecretariaa MenuSecre = new MenuSecretariaa();
-    
-    
+
     public Login() {
         initComponents();
         setIconImage(new ImageIcon(getClass().getResource("/media/logo.png")).getImage());
@@ -99,8 +104,8 @@ public class Login extends javax.swing.JFrame {
     private void jToggleButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton1ActionPerformed
         // TODO add your handling code here:
         if (jToggleButton1.isSelected()) {
-            jPasswordField1.setEchoChar((char)0);
-        }else{
+            jPasswordField1.setEchoChar((char) 0);
+        } else {
             jPasswordField1.setEchoChar('*');
         }
     }//GEN-LAST:event_jToggleButton1ActionPerformed
@@ -114,8 +119,22 @@ public class Login extends javax.swing.JFrame {
     }//GEN-LAST:event_matriculaTextFieldActionPerformed
 
     private void iniciarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_iniciarButtonActionPerformed
-        this.setVisible(false);
-        MenuSecre.setVisible(true);
+        try {
+            ISecretario secretario = RMI.getISecretarioController().findOne(matriculaTextField.getText());
+            if (secretario.getContraseña().equals(jPasswordField1.getText())) {
+                this.setVisible(false);
+                MenuSecre.setVisible(true);
+            }else{
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Matrícula o contraseña incorrecta",
+                        "Operación no exitosa",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+
+        } catch (RemoteException ex) {
+            Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_iniciarButtonActionPerformed
 
     /**

@@ -5,9 +5,20 @@
  */
 package gui;
 
+import Iniciador.RMI;
+import Interfaces.IEstudiante;
+import Interfaces.ITramite;
+import Interfaces.ITramiteController;
 import java.awt.Color;
 import java.awt.Font;
+import java.rmi.RemoteException;
+import java.util.List;
+import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -20,18 +31,18 @@ public class Tramite extends javax.swing.JFrame {
      */
     public Tramite() {
         initComponents();
+        refrescarTabla();
         setIconImage(new ImageIcon(getClass().getResource("/media/logo.png")).getImage());
         this.setLocationRelativeTo(null);
         tramiteTable.getTableHeader().setFont(new Font("Montserrat", Font.BOLD, 12));
         tramiteTable.getTableHeader().setOpaque(false);
         tramiteTable.getTableHeader().setOpaque(false);
-        tramiteTable.getTableHeader().setForeground(new Color(47,72,90));
+        tramiteTable.getTableHeader().setForeground(new Color(47, 72, 90));
         tramiteTable.setRowHeight(25);//scroll
     }
 
     AgregarTramite agregar = new AgregarTramite();
-    EditarTramite editar = new EditarTramite();
-    
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -58,6 +69,11 @@ public class Tramite extends javax.swing.JFrame {
         eliminarButton.setContentAreaFilled(false);
         eliminarButton.setRolloverIcon(new javax.swing.ImageIcon(getClass().getResource("/media/Eliminar – 1.png"))); // NOI18N
         eliminarButton.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/media/Eliminar – 1.png"))); // NOI18N
+        eliminarButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                eliminarButtonActionPerformed(evt);
+            }
+        });
         getContentPane().add(eliminarButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(1220, 450, 100, 100));
 
         agregarButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/media/Agregar.png"))); // NOI18N
@@ -135,7 +151,7 @@ public class Tramite extends javax.swing.JFrame {
         ));
         jScrollPane1.setViewportView(tramiteTable);
 
-        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 190, 1150, 470));
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 250, 1150, 470));
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/media/tramites.png"))); // NOI18N
         getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1360, 700));
@@ -143,14 +159,70 @@ public class Tramite extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    public void refrescarTabla() {
+        try {
+            Vector<Vector> datos = new Vector<>();
+
+            List<ITramite> listaTramite = RMI.getITramiteController().list();
+            List<IEstudiante> listaEstudiante = RMI.getIEstudianteController().list();
+
+            for (ITramite tramite : listaTramite) {
+                Vector registro = new Vector();
+
+                registro.add(tramite.getFolio());
+                registro.add(tramite.getFecha());
+                registro.add(tramite.getMatricula());
+                for (IEstudiante estudiante : listaEstudiante) {
+                    if (estudiante.getMatricula().equals(tramite.getMatricula())) {
+                        registro.add(estudiante.getNombres() + " " + estudiante.getApellidoPaterno() + " " + estudiante.getApellidoMaterno());
+                    }
+                }
+                registro.add(tramite.getEstado());
+
+                datos.add(registro);
+            }
+
+            Vector<String> columnas = new Vector<>();
+            columnas.add("Folio");
+            columnas.add("Fecha de solicitud");
+            columnas.add("Matrícula");
+            columnas.add("Nombre");
+            columnas.add("Estatus");
+
+            tramiteTable.setModel(new DefaultTableModel(datos, columnas));
+        } catch (RemoteException ex) {
+            Logger.getLogger(Tramite.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+
     private void agregarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_agregarButtonActionPerformed
         this.setVisible(false);
         agregar.setVisible(true);
+        refrescarTabla();
     }//GEN-LAST:event_agregarButtonActionPerformed
 
     private void editarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editarButtonActionPerformed
-        this.setVisible(false);
-        editar.setVisible(true);
+        try {
+            int filaSeleccionada = tramiteTable.getSelectedRow();
+            if (filaSeleccionada == -1) {
+                return;
+            }
+            String folio = (String) tramiteTable.getValueAt(filaSeleccionada, 0);
+            ITramite tramite = RMI.getITramiteController().findOne(folio);
+
+            if (tramite.getFolio() == null) {
+                JOptionPane.showMessageDialog(this, "Folio no encontrado.\n" + "Probablemente el folio fue eliminada previamente.", "Folio no encontrado", JOptionPane.ERROR_MESSAGE);
+                refrescarTabla();
+                return;
+            }
+            EditarTramite editarTramite = new EditarTramite(tramite);
+            this.setVisible(false);
+            editarTramite.setVisible(true);
+            refrescarTabla();
+        } catch (RemoteException ex) {
+            Logger.getLogger(Tramite.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_editarButtonActionPerformed
 
     private void homeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_homeButtonActionPerformed
@@ -158,6 +230,41 @@ public class Tramite extends javax.swing.JFrame {
         this.setVisible(false);
         MenuSecre.setVisible(true);
     }//GEN-LAST:event_homeButtonActionPerformed
+
+    private void eliminarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_eliminarButtonActionPerformed
+        try {
+            int filaSeleccionada = tramiteTable.getSelectedRow();
+            if (filaSeleccionada == -1) {
+                return;
+            }
+            int confirmacion = JOptionPane.showConfirmDialog(
+                    this,
+                    "Usted está a punto de eliminar una solicitud de impresión.\n" + "¿Desea continuar?",
+                    "Eliminar secretaria",
+                    JOptionPane.YES_NO_OPTION);
+            if (confirmacion != JOptionPane.YES_OPTION) {
+                return;
+            }
+            String folio = (String) tramiteTable.getValueAt(filaSeleccionada, 0);
+            int respuesta = RMI.getITramiteController().delete(folio);
+            
+            if (respuesta == ITramiteController.DELETE_EXITO) {
+                JOptionPane.showMessageDialog(this,
+                        "Tramite eliminado con éxito.",
+                        "Operación exitosa",
+                        JOptionPane.INFORMATION_MESSAGE);
+                refrescarTabla();
+            } else if (respuesta == ITramiteController.DELETE_SIN_EXITO) {
+                JOptionPane.showMessageDialog(this,
+                        "No fue posible completar la operación.",
+                        "Operación no exitosa",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (RemoteException ex) {
+            Logger.getLogger(Tramite.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }//GEN-LAST:event_eliminarButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -184,6 +291,7 @@ public class Tramite extends javax.swing.JFrame {
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(Tramite.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
