@@ -14,15 +14,11 @@ public interface ITramiteController extends Remote{
 
     int delete(ITramite tramite) throws RemoteException;
 
-    int delete(String matricula) throws RemoteException;
-
-    int delete(int folio) throws RemoteException;
+    int delete(String folio) throws RemoteException;
 
     List<ITramite> list() throws RemoteException;
 
-    ITramite findOne(int folio) throws RemoteException;
-
-    ITramite findOne(String matricula) throws RemoteException;
+    ITramite findOne(String folio) throws RemoteException;
 
     List<ITramite> find(ITramite tramite) throws RemoteException;
 

@@ -5,9 +5,9 @@ import java.rmi.RemoteException;
 
 public interface ITramite extends Remote {
 
-    int getFolio() throws RemoteException;
+    String getFolio() throws RemoteException;
 
-    void setFolio(int folio) throws RemoteException;
+    void setFolio(String folio) throws RemoteException;
 
     String getMatricula() throws RemoteException;
 
