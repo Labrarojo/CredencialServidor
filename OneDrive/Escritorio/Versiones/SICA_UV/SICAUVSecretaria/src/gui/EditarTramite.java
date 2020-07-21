@@ -140,8 +140,10 @@ public class EditarTramite extends javax.swing.JFrame {
                 return;
             } else {
                 tramite.setMatricula(matricula);
-                IEstudiante estudiante = RMI.getIEstudianteController().findOne(matricula);
-                nombreTextField.setText(estudiante.getNombres());
+                SimpleDateFormat fechaActual = new SimpleDateFormat("dd-MM-yyyy");
+                String fecha = fechaActual.format(new Date());
+                tramite.setFecha(fecha);
+                tramite.setEstado("Pendiente");
             }
 
             int respuesta = RMI.getITramiteController().update(tramite);
@@ -150,12 +152,6 @@ public class EditarTramite extends javax.swing.JFrame {
                         "El trámite ha sido modificado exitosamente.",
                         "Cambios registrados",
                         JOptionPane.INFORMATION_MESSAGE);
-
-                SimpleDateFormat fechaActual = new SimpleDateFormat("dd-MM-aaaa");
-                String fecha = fechaActual.format(new Date());
-                tramite.setFecha(fecha);
-                tramite.setEstado("Pendiente");
-
                 Tramite tramites = new Tramite();
                 this.setVisible(false);
                 tramites.setVisible(true);

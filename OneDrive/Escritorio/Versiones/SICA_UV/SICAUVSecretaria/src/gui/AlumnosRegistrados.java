@@ -5,19 +5,24 @@
  */
 package gui;
 
+import Iniciador.RMI;
+import Interfaces.ICarrera;
+import Interfaces.IEstudianteController;
+import Interfaces.IEstudiante;
+import Interfaces.IFacultad;
 import java.awt.Color;
 import java.awt.Font;
+import java.rmi.RemoteException;
+import java.util.List;
+import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
-/**
- *
- * @author adria
- */
 public class AlumnosRegistrados extends javax.swing.JFrame {
-
-    /**
-     * Creates new form AlumnosRegistrados
-     */
+    
     public AlumnosRegistrados() {
         initComponents();
         setIconImage(new ImageIcon(getClass().getResource("/media/logo.png")).getImage());
@@ -27,8 +32,54 @@ public class AlumnosRegistrados extends javax.swing.JFrame {
         registroAlumnoTable.getTableHeader().setOpaque(false);
         registroAlumnoTable.getTableHeader().setForeground(new Color(47,72,90));
         registroAlumnoTable.setRowHeight(25);//scroll
+        refrescarTabla();
     }
+    
+    public void refrescarTabla(){
+        try {
+            Vector<Vector> datos = new Vector<>();
+            List<IEstudiante> listaEstudiantes = RMI.getIEstudianteController().list();
+            List<IFacultad> listaFacultades = RMI.getIFacultadController().list();
+            List<ICarrera> listaCarreras = RMI.getICarreraController().list();
+           
+            for (IEstudiante estudiante : listaEstudiantes) {
+                Vector registro = new Vector();
 
+                registro.add(estudiante.getMatricula());
+                registro.add(estudiante.getApellidoPaterno());
+                registro.add(estudiante.getApellidoMaterno());
+                registro.add(estudiante.getNombres());
+                for (IFacultad facultad : listaFacultades) {
+                    if (estudiante.getIdFacultad() == facultad.getId()) {
+                        registro.add(facultad.getFacultad());
+                    }
+                }
+                
+                for (ICarrera carrera : listaCarreras) {
+                    if (estudiante.getIdCarrera() == carrera.getIdCarrera()) {
+                        registro.add(carrera.getNombreCarrera());
+                    }
+                }
+
+                datos.add(registro);
+            }
+             
+            Vector<String> columnas = new Vector<>();
+            columnas.add("Matrícula");
+            columnas.add("Apellido paterno");
+            columnas.add("Apellido materno");
+            columnas.add("Nombre");
+            columnas.add("Facultad");
+            columnas.add("Carrera");
+            columnas.add("Foto");
+            columnas.add("Firma");
+         
+            registroAlumnoTable.setModel(new DefaultTableModel(datos, columnas));
+        } catch (RemoteException ex) {
+            Logger.getLogger(AlumnosRegistrados.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
     AgregarAlumno agregar = new AgregarAlumno();
     EditarAlumno editar = new EditarAlumno();
     
@@ -58,6 +109,11 @@ public class AlumnosRegistrados extends javax.swing.JFrame {
         eliminarButton.setContentAreaFilled(false);
         eliminarButton.setRolloverIcon(new javax.swing.ImageIcon(getClass().getResource("/media/Eliminar – 1.png"))); // NOI18N
         eliminarButton.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/media/Eliminar – 1.png"))); // NOI18N
+        eliminarButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                eliminarButtonActionPerformed(evt);
+            }
+        });
         getContentPane().add(eliminarButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(1220, 450, 100, 100));
 
         agregarButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/media/Agregar.png"))); // NOI18N
@@ -98,38 +154,38 @@ public class AlumnosRegistrados extends javax.swing.JFrame {
         registroAlumnoTable.setFont(new java.awt.Font("Tw Cen MT", 0, 14)); // NOI18N
         registroAlumnoTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null}
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "Id Alumno", "Nombre", "Facultad", "Carrera", "Foto", "Firma"
+                "Id Alumno", "ApellidoPaterno", "ApellidoMaterno", "Nombre", "Facultad", "Carrera", "Foto", "Firma"
             }
         ));
         jScrollPane1.setViewportView(registroAlumnoTable);
@@ -144,12 +200,50 @@ public class AlumnosRegistrados extends javax.swing.JFrame {
 
     private void agregarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_agregarButtonActionPerformed
         this.setVisible(false);
-        agregar.setVisible(true);
+            agregar.setVisible(true);
+        /*(try {
+            this.setVisible(false);
+            agregar.setVisible(true);
+            int filaSeleccionada = registroAlumnoTable.getSelectedRow();
+            if(filaSeleccionada == -1){
+                return;
+            }
+            
+            String matricula = (String) registroAlumnoTable.getValueAt( filaSeleccionada, 0);
+            IEstudiante estudiante = RMI.getIEstudianteController().findOne(matricula);
+            refrescarTabla();
+        } catch (RemoteException ex) {
+            Logger.getLogger(AlumnosRegistrados.class.getName()).log(Level.SEVERE, null, ex);
+        }*/
     }//GEN-LAST:event_agregarButtonActionPerformed
 
     private void editarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editarButtonActionPerformed
-        this.setVisible(false);
-        editar.setVisible(true);
+        try {
+            int filaSeleccionada = registroAlumnoTable.getSelectedRow();
+            if (filaSeleccionada == -1) {
+                return;
+            }
+            String matricula = (String) registroAlumnoTable.getValueAt(filaSeleccionada, 0);
+            IEstudiante estudiante = RMI.getIEstudianteController().findOne(matricula);
+
+            if (estudiante.getMatricula() == null) {
+                JOptionPane.showMessageDialog(
+                        this, 
+                        "Matrícula no encontrada.\n" + "Probablemente la matrícula fue eliminada previamente.",
+                        "Matrícula no encontrada",
+                        JOptionPane.ERROR_MESSAGE);
+                refrescarTabla();
+                return;
+            }
+            
+            EditarAlumno editarAlumno = new EditarAlumno(estudiante);
+            this.setVisible(false);
+            editarAlumno.setVisible(true);
+            refrescarTabla();
+            
+        } catch (RemoteException ex) {
+            Logger.getLogger(AlumnosRegistrados.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_editarButtonActionPerformed
 
     private void homeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_homeButtonActionPerformed
@@ -157,6 +251,52 @@ public class AlumnosRegistrados extends javax.swing.JFrame {
         this.setVisible(false);
         MenuSecre.setVisible(true);
     }//GEN-LAST:event_homeButtonActionPerformed
+
+    private void eliminarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_eliminarButtonActionPerformed
+        try {
+            int filaSeleccionada = registroAlumnoTable.getSelectedRow();
+            if( filaSeleccionada == -1){
+                return;
+            }
+            int confirmacion = JOptionPane.showConfirmDialog(
+                    this,"Usted está a punto de eliminar un alumno.\n"+"¿Desea continuar?",
+                    "Eliminar alumno",
+                    JOptionPane.YES_NO_OPTION);
+            if( confirmacion != JOptionPane.YES_OPTION){
+                return;
+            }
+            
+            String matricula = (String) registroAlumnoTable.getValueAt(filaSeleccionada,0);
+            
+            int respuesta =  RMI.getIEstudianteController().delete(matricula);
+            
+            if( respuesta ==  IEstudianteController.DELETE_EXITO){
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Alumno eliminado con éxito.",
+                        "Operación exitosa",
+                        JOptionPane.INFORMATION_MESSAGE);
+                refrescarTabla();
+            }else if( respuesta == IEstudianteController.DELETE_ESTUDIANTE_INEXISTENTE){
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Alumno no encontrado.",
+                        "Operación sin éxito",
+                        JOptionPane.ERROR_MESSAGE);
+            }else{
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Operación incompleta.\n"+"Probablemente el alumno fue eliminado previamente.",
+                        "Operación incompleta",
+                        JOptionPane.ERROR_MESSAGE);
+                refrescarTabla();
+            }
+            
+        } catch (RemoteException ex) {
+            Logger.getLogger(AlumnosRegistrados.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }//GEN-LAST:event_eliminarButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -183,6 +323,7 @@ public class AlumnosRegistrados extends javax.swing.JFrame {
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(AlumnosRegistrados.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */

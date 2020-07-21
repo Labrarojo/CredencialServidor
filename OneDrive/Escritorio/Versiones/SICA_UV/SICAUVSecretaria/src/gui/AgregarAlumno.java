@@ -5,25 +5,49 @@
  */
 package gui;
 
+import Iniciador.RMI;
+import Interfaces.ICarrera;
+import Interfaces.IEstudianteController;
+import Interfaces.IEstudiante;
+import Interfaces.IFacultad;
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.rmi.RemoteException;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-/**
- *
- * @author adria
- */
 public class AgregarAlumno extends javax.swing.JFrame {
 
-    /**
-     * Creates new form AgregarAlumno
-     */
+    private List<IFacultad> listaFacultad;
+    private List<ICarrera> listaCarrera;
+
     public AgregarAlumno() {
         initComponents();
         setIconImage(new ImageIcon(getClass().getResource("/media/logo.png")).getImage());
         this.setLocationRelativeTo(null);
+
+        try {
+            listaFacultad = RMI.getIFacultadController().list();
+            for (IFacultad nombreFacultad : listaFacultad) {
+                facultadComboBox.addItem(nombreFacultad.getFacultad());
+            }
+        } catch (RemoteException ex) {
+            Logger.getLogger(AgregarAlumno.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        try {
+            listaCarrera = RMI.getICarreraController().list();
+            for (ICarrera nombreCarrera : listaCarrera) {
+                carreraComboBox.addItem(nombreCarrera.getNombreCarrera());
+            }
+        } catch (RemoteException ex) {
+            Logger.getLogger(AgregarAlumno.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -38,7 +62,7 @@ public class AgregarAlumno extends javax.swing.JFrame {
         maternoTextField = new javax.swing.JTextField();
         nombreTextField = new javax.swing.JTextField();
         matriculaTextField = new javax.swing.JTextField();
-        paternoTextField1 = new javax.swing.JTextField();
+        paternoTextField = new javax.swing.JTextField();
         carreraComboBox = new javax.swing.JComboBox<>();
         aceptarButton = new javax.swing.JButton();
         facultadComboBox = new javax.swing.JComboBox<>();
@@ -67,6 +91,11 @@ public class AgregarAlumno extends javax.swing.JFrame {
         nombreTextField.setBackground(new java.awt.Color(220, 236, 246));
         nombreTextField.setFont(new java.awt.Font("Tw Cen MT", 0, 24)); // NOI18N
         nombreTextField.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(220, 236, 246), 3, true));
+        nombreTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                nombreTextFieldActionPerformed(evt);
+            }
+        });
         getContentPane().add(nombreTextField, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 170, 950, 60));
 
         matriculaTextField.setBackground(new java.awt.Color(220, 236, 246));
@@ -74,26 +103,34 @@ public class AgregarAlumno extends javax.swing.JFrame {
         matriculaTextField.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(220, 236, 246), 3, true));
         getContentPane().add(matriculaTextField, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 400, 460, 60));
 
-        paternoTextField1.setBackground(new java.awt.Color(220, 236, 246));
-        paternoTextField1.setFont(new java.awt.Font("Tw Cen MT", 0, 24)); // NOI18N
-        paternoTextField1.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(220, 236, 246), 3, true));
-        getContentPane().add(paternoTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 290, 460, 60));
+        paternoTextField.setBackground(new java.awt.Color(220, 236, 246));
+        paternoTextField.setFont(new java.awt.Font("Tw Cen MT", 0, 24)); // NOI18N
+        paternoTextField.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(220, 236, 246), 3, true));
+        getContentPane().add(paternoTextField, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 290, 460, 60));
 
         carreraComboBox.setBackground(new java.awt.Color(220, 236, 246));
         carreraComboBox.setFont(new java.awt.Font("Tw Cen MT", 0, 28)); // NOI18N
-        carreraComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Ingeniería de Software", "Administración", "Contabilidad" }));
         carreraComboBox.setBorder(null);
         carreraComboBox.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        carreraComboBox.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                carreraComboBoxItemStateChanged(evt);
+            }
+        });
         getContentPane().add(carreraComboBox, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 400, 460, 60));
 
         aceptarButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/media/aceptar.png"))); // NOI18N
         aceptarButton.setBorder(null);
         aceptarButton.setContentAreaFilled(false);
+        aceptarButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                aceptarButtonActionPerformed(evt);
+            }
+        });
         getContentPane().add(aceptarButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(850, 610, 200, 50));
 
         facultadComboBox.setBackground(new java.awt.Color(220, 236, 246));
         facultadComboBox.setFont(new java.awt.Font("Tw Cen MT", 0, 28)); // NOI18N
-        facultadComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Facultad de Contaduria y Administración", "Facultad de Ingeniería" }));
         facultadComboBox.setBorder(null);
         facultadComboBox.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         getContentPane().add(facultadComboBox, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 510, 960, 60));
@@ -101,6 +138,11 @@ public class AgregarAlumno extends javax.swing.JFrame {
         cancelarButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/media/cancelar.png"))); // NOI18N
         cancelarButton.setBorder(null);
         cancelarButton.setContentAreaFilled(false);
+        cancelarButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cancelarButtonActionPerformed(evt);
+            }
+        });
         getContentPane().add(cancelarButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(1070, 610, 200, 50));
 
         selecFotoButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/media/Grupo 178.png"))); // NOI18N
@@ -148,13 +190,13 @@ public class AgregarAlumno extends javax.swing.JFrame {
     private void selecFotoButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selecFotoButton1ActionPerformed
         // TODO add your handling code here:
         JFileChooser Buscar = new JFileChooser();
-        FileNameExtensionFilter Extension= new FileNameExtensionFilter("Seleccionar imagen", "jpg","png");
+        FileNameExtensionFilter Extension = new FileNameExtensionFilter("Seleccionar imagen", "jpg", "png");
         Buscar.setFileFilter(Extension);
-        
-        if (Buscar.showOpenDialog(this)== JFileChooser.APPROVE_OPTION) {
-            Toolkit Tool=Toolkit.getDefaultToolkit();
-            String Ruta=Buscar.getSelectedFile().toString();
-            Image Imagen=Tool.createImage(Ruta);
+
+        if (Buscar.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            Toolkit Tool = Toolkit.getDefaultToolkit();
+            String Ruta = Buscar.getSelectedFile().toString();
+            Image Imagen = Tool.createImage(Ruta);
             firmaLabel.setIcon(new ImageIcon(Imagen.getScaledInstance(firmaLabel.getWidth(), firmaLabel.getHeight(), Image.SCALE_AREA_AVERAGING)));
         }
     }//GEN-LAST:event_selecFotoButton1ActionPerformed
@@ -162,13 +204,13 @@ public class AgregarAlumno extends javax.swing.JFrame {
     private void selecFotoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selecFotoButtonActionPerformed
         // TODO add your handling code here:
         JFileChooser Buscar = new JFileChooser();
-        FileNameExtensionFilter Extension= new FileNameExtensionFilter("Seleccionar imagen", "jpg","png");
+        FileNameExtensionFilter Extension = new FileNameExtensionFilter("Seleccionar imagen", "jpg", "png");
         Buscar.setFileFilter(Extension);
-        
-        if (Buscar.showOpenDialog(this)== JFileChooser.APPROVE_OPTION) {
-            Toolkit Tool=Toolkit.getDefaultToolkit();
-            String Ruta=Buscar.getSelectedFile().toString();
-            Image Imagen=Tool.createImage(Ruta);
+
+        if (Buscar.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            Toolkit Tool = Toolkit.getDefaultToolkit();
+            String Ruta = Buscar.getSelectedFile().toString();
+            Image Imagen = Tool.createImage(Ruta);
             fotoLabel.setIcon(new ImageIcon(Imagen.getScaledInstance(fotoLabel.getWidth(), fotoLabel.getHeight(), Image.SCALE_AREA_AVERAGING)));
         }
     }//GEN-LAST:event_selecFotoButtonActionPerformed
@@ -178,6 +220,153 @@ public class AgregarAlumno extends javax.swing.JFrame {
         this.setVisible(false);
         alumnos.setVisible(true);
     }//GEN-LAST:event_atrasButtonActionPerformed
+
+    private void nombreTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nombreTextFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_nombreTextFieldActionPerformed
+
+    private void aceptarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aceptarButtonActionPerformed
+        try {
+            String nombre = nombreTextField.getText();
+            String apellidoPaterno = paternoTextField.getText();
+            String apellidoMaterno = maternoTextField.getText();
+            String matricula = matriculaTextField.getText();
+            String nombreFacultad = (String) facultadComboBox.getSelectedItem();
+            String nombreCarrera = (String) carreraComboBox.getSelectedItem();
+
+            IEstudiante estudiante = RMI.getIEstudianteController().newInstance();
+
+            if (nombre.length() == 0) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Ingrese nombre.",
+                        "Validación",
+                        JOptionPane.ERROR_MESSAGE);
+                nombreTextField.requestFocus();
+                return;
+            } else {
+                estudiante.setNombres(nombre);
+            }
+
+            if (apellidoPaterno.length() == 0) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Ingrese el apellido paterno.",
+                        "Validación",
+                        JOptionPane.ERROR_MESSAGE);
+                paternoTextField.requestFocus();
+                return;
+            } else {
+                estudiante.setApellidoPaterno(apellidoPaterno);
+            }
+
+            if (apellidoMaterno.length() == 0) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Ingrese el apellido materno.",
+                        "Validación",
+                        JOptionPane.ERROR_MESSAGE);
+                maternoTextField.requestFocus();
+                return;
+            } else {
+                estudiante.setApellidoMaterno(apellidoMaterno);
+            }
+
+            if (matricula.length() == 0) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Ingrese la matrícula.",
+                        "Validación",
+                        JOptionPane.ERROR_MESSAGE);
+                matriculaTextField.requestFocus();
+                return;
+            } else {
+                estudiante.setMatricula(matricula);
+            }
+
+            if (nombreCarrera.length() == 0) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Seleccione una carrera.",
+                        "Validación",
+                        JOptionPane.ERROR_MESSAGE);
+                carreraComboBox.requestFocus();
+                return;
+            } else {
+                for (ICarrera iCarrera : listaCarrera) {
+                    if (iCarrera.getNombreCarrera().equals(nombreCarrera)) {
+                        estudiante.setIdCarrera(iCarrera.getIdCarrera());
+                    }
+                }
+            }
+
+            if (nombreFacultad.length() == 0) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Seleccione una facultad.",
+                        "Validación",
+                        JOptionPane.ERROR_MESSAGE);
+                facultadComboBox.requestFocus();
+                return;
+            } else {
+                for (IFacultad iFacultad : listaFacultad) {
+                    if (iFacultad.getFacultad().equals(nombreFacultad)) {
+                        estudiante.setIdFacultad(iFacultad.getId());
+                    }
+                }
+            }
+
+            int respuesta = RMI.getIEstudianteController().add(estudiante);
+
+            if (respuesta == IEstudianteController.ADD_EXITO) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Alumno agregado con éxito.",
+                        "Operación exitosa",
+                        JOptionPane.INFORMATION_MESSAGE);
+
+                AlumnosRegistrados alumnos = new AlumnosRegistrados();
+                this.setVisible(false);
+                alumnos.setVisible(true);
+            } else if (respuesta == IEstudianteController.ADD_ESTUDIANTE_DUPLICADO) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "La matrícula ingresada ya se encuentra registrada.",
+                        "Operación no exitosa",
+                        JOptionPane.ERROR_MESSAGE);
+            } else if (respuesta == IEstudianteController.ADD_SIN_EXITO) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "No fue posible completar la operación.",
+                        "Operación no exitosa",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (RemoteException ex) {
+            Logger.getLogger(AgregarAlumno.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_aceptarButtonActionPerformed
+
+    private void cancelarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelarButtonActionPerformed
+        AlumnosRegistrados alumnos = new AlumnosRegistrados();
+        this.setVisible(false);
+        alumnos.setVisible(true);
+    }//GEN-LAST:event_cancelarButtonActionPerformed
+
+    private void carreraComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_carreraComboBoxItemStateChanged
+        try {
+            for (ICarrera carrera : listaCarrera) {
+                if (carrera.getNombreCarrera().equals(carreraComboBox.getSelectedItem())) {
+                    for (IFacultad facultad : listaFacultad) {
+                        if (facultad.getId() == carrera.getIdFacultad()) {
+                            facultadComboBox.setSelectedItem(facultad.getFacultad());
+                        }
+                    }
+                }
+            }
+        } catch (RemoteException ex) {
+            Logger.getLogger(AgregarAlumno.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_carreraComboBoxItemStateChanged
 
     /**
      * @param args the command line arguments
@@ -205,6 +394,7 @@ public class AgregarAlumno extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(AgregarAlumno.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
+        //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -226,7 +416,7 @@ public class AgregarAlumno extends javax.swing.JFrame {
     private javax.swing.JTextField maternoTextField;
     private javax.swing.JTextField matriculaTextField;
     private javax.swing.JTextField nombreTextField;
-    private javax.swing.JTextField paternoTextField1;
+    private javax.swing.JTextField paternoTextField;
     private javax.swing.JButton selecFotoButton;
     private javax.swing.JButton selecFotoButton1;
     // End of variables declaration//GEN-END:variables
